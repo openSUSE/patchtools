@@ -17,13 +17,13 @@ maintainers = [
     {email = "tonyj@suse.com", name = "Tony Jones"}
 ]
 classifiers = [
-    "License :: OSI Approved :: Apache Software License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.6",
     "Operating System :: POSIX :: Linux",
 ]
-[project.license-files]
-paths = ["COPYING", "AUTHORS"]
+dynamic = ["version"]
+
+license-files = ["COPYING"]
 
 [project.urls]
 Homepage = "http://github.com/jeffmahoney/patchtools"
