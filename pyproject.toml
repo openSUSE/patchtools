@@ -1,0 +1,92 @@
+[build-system]
+requires = ["setuptools>=40", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "patchtools"
+description = "Tools for handling upstream patches"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.6"
+authors = [
+    {email = "jeffm@suse.com", name = "Jeff Mahoney"}
+]
+maintainers = [
+    {email = "jeffm@suse.com", name = "Jeff Mahoney"},
+    {email = "lduncan@suse.com", name = "Lee Duncan"},
+    {email = "tonyj@suse.com", name = "Tony Jones"}
+]
+classifiers = [
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.6",
+    "Operating System :: POSIX :: Linux",
+]
+[project.license-files]
+paths = ["COPYING", "AUTHORS"]
+
+[project.urls]
+Homepage = "http://github.com/jeffmahoney/patchtools"
+
+[project.scripts]
+exportpatch = "patchtools.exportpatch:main"
+fixpatch = "patchtools.fixpatch:main"
+
+[tool.ruff]
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "F",    # Pyflakes
+    "E",    # pycodestyle error
+    "W",    # pycodestyle warning
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "YTT",  # flake8-2020
+    "S",    # flake8-bandit
+    "B",    # flake8-bugbear
+    "A",    # flake8-builtins
+    "COM",  # flake8-commas
+    "C4",   # flake8-comprehensions
+    "EXE",  # flake8-executable
+    "FA",   # flake8-future-annotations
+    "ISC",  # flake8-implicit-str-concat
+    "ICN",  # flake8-import-conventions
+    "PIE",  # flake8-pie
+    "Q003", # flake8-quotes avoidable-escaped-quote
+    "Q004", # flake8-quotes unnecessary-escaped-quote
+    "RSE",  # flake8-raise
+    "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "TID",  # flake8-tidy-imports
+    "INT",  # flake8-gettext
+    "ARG",  # flake8-unused-argument
+    #"PTH", # flake8-use-pathlib TODO
+    "PL",   # Pylint
+    "FLY",  # flynt
+    "PERF", # Perflint
+    "FURB", # refurb
+    "RUF",  # Ruff
+    # ignore these?
+    "E722",  # TODO do not use bare 'except'
+    "S104",  # Possible binding to all interfaces (0.0.0.0)
+    "RUF012",  # TODO Mutable class attributes should be annotated with `typing.ClassVar`
+    "B904",  # raise-without-from-inside-except
+    "ARG002", "PLR6301",  # TODO Unused self, parameter in methods definitions
+    "PLR09",  # Too many branches/statements/arguments
+    "PLW1514", # TODO `open` in text mode without explicit `encoding` argument
+]
+
+ignore = [
+    "I001", # Unsorted imports
+    "S603", # unsafe subprocess
+    "S404", # subprocess is insecure
+    "PLR6301", # XXX: because some "clean()" methods do nothing, for now
+    "D400", # doc strings shouldn't need a damn period -- it's not prose
+    "D415", # doc strings also don't need '!' or '?'
+]
+
+[tool.ruff.lint.flake8-quotes]
+# Double quotes are currently prevalent in the codebase. Not being checked.
+inline-quotes = "double"

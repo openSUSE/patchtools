@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# vim: sw=4 ts=4 et si:
 """
 Export a patch from a repository with the SUSE set of patch headers.
 From Jeff Mahoney, updated by Lee Duncan.
@@ -66,7 +65,9 @@ def export_patch(commit, options, prefix, suffix):
         print("Couldn't locate commit \"%s\"; Skipping." % commit, file=sys.stderr)
         sys.exit(1)
 
-if __name__ == "__main__":
+
+def main():
+    """Export one or more patches from git, by commit hash"""
     parser = OptionParser(version='%prog ' + __revision__,
                           usage='%prog [options] <LIST OF COMMIT HASHES> --  export patch with proper patch headers')
     parser.add_option("-w", "--write", action="store_true",
@@ -133,4 +134,8 @@ if __name__ == "__main__":
         export_patch(commit, options, prefix, suffix)
         n += 1
 
-    sys.exit(0)
+
+if __name__ == "__main__":
+    main()
+
+# vim: sw=4 ts=4 et si:

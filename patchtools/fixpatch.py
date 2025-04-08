@@ -1,5 +1,4 @@
 #!/usr/bin/python3
-# vim: sw=4 ts=4 et si:
 """
 Take an existing patch and add the appropriate tags, drawing from known
 repositories to discover the origin. Also, renames the patch using the
@@ -79,7 +78,8 @@ def process_file(pathname, options):
     except PatchException as e:
         print(e, file=sys.stderr)
 
-if __name__ == "__main__":
+def main():
+    """Fix one or more patch files"""
     parser = OptionParser(version='%prog ' + __revision__)
     parser.add_option("-n", "--dry-run", action="store_true", default=False,
                       help="Output results to stdout but don't commit change")
@@ -117,4 +117,8 @@ if __name__ == "__main__":
     for pathname in args:
         process_file(pathname, options)
 
-    sys.exit(0)
+
+if __name__ == "__main__":
+    main()
+
+# vim: sw=4 ts=4 et si:
