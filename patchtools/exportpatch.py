@@ -1,7 +1,6 @@
-#!/usr/bin/python3
-"""
-Export a patch from a repository with the SUSE set of patch headers.
-From Jeff Mahoney, updated by Lee Duncan.
+"""Export patches from upstream, in SUSE format.
+
+Export one or more patches from a repository with the SUSE set of patch headers.
 """
 
 __revision__ = 'Revision: 2.0'
@@ -63,7 +62,7 @@ def export_patch(commit, options, prefix, suffix):
             print(p.message.as_string(False))
     else:
         print("Couldn't locate commit \"%s\"; Skipping." % commit, file=sys.stderr)
-        sys.exit(1)
+        return 1
 
 
 def main():
@@ -104,17 +103,18 @@ def main():
 
     if not args:
         parser.error("Must supply patch hash(es)")
-        sys.exit(1)
+        return 1
 
     try:
         n = int(options.first_number)
     except ValueError: 
         print("option -N needs a number")
-        sys.exit(1)
+        return 1
 
     if n + len(args) > 9999 or n < 0:
         print("The starting number + commits needs to be in the range 0 - 9999")
-        sys.exit(1)
+        return 1
+
     suffix = ""
     if options.suffix:
         suffix = ".patch"
@@ -131,11 +131,9 @@ def main():
         if options.numeric:
             prefix = "{0:0{1}}-".format(n, num_width)
 
-        export_patch(commit, options, prefix, suffix)
+        res = export_patch(commit, options, prefix, suffix)
+        if res != 0:
+            return res
         n += 1
-
-
-if __name__ == "__main__":
-    main()
 
 # vim: sw=4 ts=4 et si:

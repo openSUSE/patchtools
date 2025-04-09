@@ -1,5 +1,5 @@
-#!/usr/bin/python3
-"""
+"""Fix an existing patch to be in the proper SUSE format.
+
 Take an existing patch and add the appropriate tags, drawing from known
 repositories to discover the origin. Also, renames the patch using the
 subject found in the patch itself.
@@ -112,13 +112,9 @@ def main():
 
     if not args:
         parser.error("Must supply patch filename(s)")
-        sys.exit(1)
+        return 1
 
     for pathname in args:
         process_file(pathname, options)
-
-
-if __name__ == "__main__":
-    main()
 
 # vim: sw=4 ts=4 et si:
