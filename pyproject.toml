@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "patchtools"
 description = "Tools for handling upstream patches"
 readme = "README.md"
-license = "Apache-2.0"
+license = {file = 'COPYING'}
 requires-python = ">=3.6"
 authors = [
     {email = "jeffm@suse.com", name = "Jeff Mahoney"}
@@ -22,8 +22,6 @@ classifiers = [
     "Operating System :: POSIX :: Linux",
 ]
 dynamic = ["version"]
-
-license-files = ["COPYING"]
 
 [project.urls]
 Homepage = "http://github.com/jeffmahoney/patchtools"
