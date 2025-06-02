@@ -54,7 +54,7 @@ class Config:
         try:
             self.repos = config.get('repositories', 'search').split()
             repos = config.get('repositories', 'mainline').split()
-            self.mainline_repos.append(repos)
+            self.mainline_repos += repos
         except (configparser.NoOptionError, configparser.NoSectionError) as e:
             pass
 
