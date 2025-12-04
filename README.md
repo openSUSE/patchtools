@@ -1,4 +1,4 @@
-SUSE Patch Tools
+# SUSE Patch Tools
 
 These python script allow easy manipulation of Linux patches, which makes
 back-porting them much easier.
@@ -10,6 +10,12 @@ If you have installed this tool via an RPM or other package, you'll need
 to copy the sample config file from /etc to ~/.local/etc/patch.cfg and edit
 it to fit your site.
 
-Tools written by Jeff Mahoney <jeffm@suse.com>
-Setuptools integration by Lee Duncan <lduncan@suse.com>
-Conversion to Python3 by Tony Jones <tonyj@suse.de>
+* Tools written by Jeff Mahoney <jeffm@suse.com>
+* Setuptools integration by Lee Duncan <lduncan@suse.com>
+* Conversion to Python3 by Tony Jones <tonyj@suse.de>
+
+# Installation
+
+To install this code on your system manually, you can use:
+
+    python3 -mpip install --prefix=/usr/local .
