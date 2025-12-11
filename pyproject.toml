@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=40", "wheel"]
+requires = ["setuptools >= 40", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,7 +7,7 @@ name = "patchtools"
 description = "Tools for handling upstream patches"
 readme = "README.md"
 license = {file = 'COPYING'}
-requires-python = ">=3.6"
+requires-python = ">= 3.6"
 authors = [
     {email = "jeffm@suse.com", name = "Jeff Mahoney"}
 ]
@@ -24,11 +24,14 @@ classifiers = [
 dynamic = ["version"]
 
 [project.urls]
-Homepage = "http://github.com/jeffmahoney/patchtools"
+Homepage = "http://github.com/opensuse/patchtools"
 
 [project.scripts]
 exportpatch = "patchtools.exportpatch:main"
 fixpatch = "patchtools.fixpatch:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "patchtools.__version__"}
 
 [tool.ruff]
 line-length = 120

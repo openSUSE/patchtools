@@ -5,7 +5,7 @@
 import os
 from . import config
 
-__version__ = '1.2'
+__version__ = '2.6'
 
 class PatchException(Exception):
     pass

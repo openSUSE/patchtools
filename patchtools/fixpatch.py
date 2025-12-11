@@ -5,12 +5,12 @@ repositories to discover the origin. Also, renames the patch using the
 subject found in the patch itself.
 """
 
-__revision__ = 'Revision: 2.0'
 __author__ = 'Jeff Mahoney'
 
 
 from patchtools import PatchException
 from patchtools.patch import Patch
+from patchtools import __version__ as patchtools_version
 from optparse import OptionParser
 import sys
 import os
@@ -80,7 +80,7 @@ def process_file(pathname, options):
 
 def main():
     """Fix one or more patch files"""
-    parser = OptionParser(version='%prog ' + __revision__)
+    parser = OptionParser(version='%prog ' + patchtools_version)
     parser.add_option("-n", "--dry-run", action="store_true", default=False,
                       help="Output results to stdout but don't commit change")
     parser.add_option("-N", "--no-ack", action="store_true", default=False,

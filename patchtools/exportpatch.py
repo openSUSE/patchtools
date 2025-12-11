@@ -10,6 +10,7 @@ import sys
 import re
 from patchtools import PatchException
 from patchtools.patch import Patch, EmptyCommitException
+from patchtools import __version__ as patchtools_version
 from optparse import OptionParser
 from urllib.parse import urlparse
 import os
@@ -67,7 +68,7 @@ def export_patch(commit, options, prefix, suffix):
 
 def main():
     """Export one or more patches from git, by commit hash"""
-    parser = OptionParser(version='%prog ' + __revision__,
+    parser = OptionParser(version='%prog ' + patchtools_version,
                           usage='%prog [options] <LIST OF COMMIT HASHES> --  export patch with proper patch headers')
     parser.add_option("-w", "--write", action="store_true",
                       help="write patch file(s) instead of stdout [default is %default]",
