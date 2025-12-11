@@ -11,3 +11,12 @@ class PatchException(Exception):
     pass
 
 config = config.Config()
+
+__all__ = [
+        'command',
+        'config',
+        'exportpatch',
+        'fixpatch',
+        'patchops',
+        'patch',
+        ]
