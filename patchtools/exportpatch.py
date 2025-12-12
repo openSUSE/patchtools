@@ -1,19 +1,18 @@
-"""Export patches from upstream, in SUSE format.
+"""
+Export patches from upstream, in SUSE format.
 
 Export one or more patches from a repository with the SUSE set of patch headers.
 """
 
-__revision__ = 'Revision: 2.0'
 __author__ = 'Jeff Mahoney'
 
+import os
 import sys
-import re
+from optparse import OptionParser
+
+from patchtools import __version__ as patchtools_version
 from patchtools import PatchException
 from patchtools.patch import Patch, EmptyCommitException
-from patchtools import __version__ as patchtools_version
-from optparse import OptionParser
-from urllib.parse import urlparse
-import os
 
 
 # default: do not write out a patch file
@@ -21,6 +20,7 @@ WRITE=False
 
 # default directory where patch gets written
 DIR="."
+
 
 def export_patch(commit, options, prefix, suffix):
     try:
@@ -136,5 +136,7 @@ def main():
         if res != 0:
             return res
         n += 1
+
+    return 0
 
 # vim: sw=4 ts=4 et si:

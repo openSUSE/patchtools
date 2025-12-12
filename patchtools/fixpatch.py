@@ -1,4 +1,5 @@
-"""Fix an existing patch to be in the proper SUSE format.
+"""
+Fix an existing patch to be in the proper SUSE format.
 
 Take an existing patch and add the appropriate tags, drawing from known
 repositories to discover the origin. Also, renames the patch using the
@@ -8,14 +9,16 @@ subject found in the patch itself.
 __author__ = 'Jeff Mahoney'
 
 
+import os
+import sys
+from optparse import OptionParser
 from patchtools import PatchException
 from patchtools.patch import Patch
 from patchtools import __version__ as patchtools_version
-from optparse import OptionParser
-import sys
-import os
+
 
 def process_file(pathname, options):
+    """Try to fix a patch file -- errors are ignored"""
     try:
         p = Patch()
         f = open(pathname, "r")
@@ -78,6 +81,7 @@ def process_file(pathname, options):
     except PatchException as e:
         print(e, file=sys.stderr)
 
+
 def main():
     """Fix one or more patch files"""
     parser = OptionParser(version='%prog ' + patchtools_version)
@@ -116,5 +120,7 @@ def main():
 
     for pathname in args:
         process_file(pathname, options)
+
+    return 0
 
 # vim: sw=4 ts=4 et si:
