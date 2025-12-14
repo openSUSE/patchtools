@@ -29,7 +29,8 @@ class CleanCommand(Command):
         self.cwd = os.getcwd()
 
     def run(self):
-        assert os.getcwd() == self.cwd, f'Must be in package root: {self.cwd}'
+        if os.getcwd() != self.cwd:
+            raise Exception(f'Must be in package root: {self.cwd}')
         print('Removing "build" subdirectory, and everything under it')
         shutil.rmtree('./build', ignore_errors=True)
         print('Removing "scripts" subdirectory, and everything under it')

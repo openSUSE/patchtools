@@ -1,13 +1,14 @@
-# vim: sw=4 ts=4 et si:
-#
-"""patch class"""
+"""
+The 'patch' class
 
-import os
+Used to represent all patches
+"""
+
 from . import config
 
 __version__ = '2.6'
 
-class PatchException(Exception):
+class PatchError(Exception):
     pass
 
 config = config.Config()
@@ -20,3 +21,5 @@ __all__ = [
         'patchops',
         'patch',
         ]
+
+# vim: sw=4 ts=4 et si:

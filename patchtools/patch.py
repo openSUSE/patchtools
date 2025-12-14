@@ -1,30 +1,28 @@
-# vim: sw=4 ts=4 et si:
 """
+The 'Patch' class.
+
 Support package for doing SUSE Patch operations
 """
 
-import patchtools.patchops as patchops
-from patchtools import config, PatchException
+from patchtools import patchops, config, PatchError
 import re
 import os
 import os.path
 import email.parser
-import urllib.request, urllib.parse, urllib.error
-from urllib.parse import urlparse
-import string
+from urllib.parse import urlparse, unquote
 
 _patch_start_re = re.compile(r"^(---|\*\*\*|Index:)[ \t][^ \t]|^diff -|^index [0-9a-f]{7}")
 
-class InvalidCommitIDException(PatchException):
+class InvalidCommitIDError(PatchError):
     pass
 
-class InvalidPatchException(PatchException):
+class InvalidPatchError(PatchError):
     pass
 
-class InvalidURLException(PatchException):
+class InvalidURLError(PatchError):
     pass
 
-class EmptyCommitException(PatchException):
+class EmptyCommitError(PatchError):
     pass
 
 class Patch:
@@ -44,7 +42,7 @@ class Patch:
             print("DEBUG: repo_list:", self.repo_list)
 
         if commit and (re.search(r"\^", commit) or re.search(r"HEAD", commit)):
-            raise InvalidCommitIDException("Commit IDs must be hashes, not relative references. HEAD and ^ are not allowed.")
+            raise InvalidCommitIDError("Commit IDs must be hashes, not relative references. HEAD and ^ are not allowed.")
 
     def add_diffstat(self):
         for line in self.message.get_payload().splitlines():
@@ -52,19 +50,14 @@ class Patch:
                 return
 
         diffstat = patchops.get_diffstat(self.body())
-        text = ""
         switched = False
         need_sep = True
-        body = ""
 
         for line in self.header().splitlines():
             if re.match(r"^---$", line) and not switched:
                 need_sep = False
 
-        if need_sep:
-            diffstat = "---\n" + diffstat
-        else:
-            diffstat = "\n" + diffstat
+        diffstat = "---\n" + diffstat if need_sep else "\n" + diffstat
         diffstat += "\n"
 
         header = self.header().rstrip() + "\n"
@@ -105,9 +98,9 @@ class Patch:
 
     def add_signature(self, sob=False):
         for line in self.message.get_payload().splitlines():
-            for email in config.emails:
-                if re.search(r"Acked-by.*%s" % email, line) or \
-                   re.search(r"Signed-off-by.*%s" % email, line):
+            for email_addr in config.emails:
+                if re.search(rf'Acked-by.*{email_addr}', line) or \
+                   re.search(rf'Signed-off-by.*{email_addr}', line):
                     return
 
         text = ""
@@ -119,11 +112,8 @@ class Patch:
                 # If this is the first *-by tag, separate it
                 if not re.search(r"-by: ", last):
                     text += "\n"
-                if sob:
-                    tag = "Signed-off-by"
-                else:
-                    tag = "Acked-by"
-                text += "%s: %s <%s>\n" % (tag, config.name, config.email)
+                tag = "Signed-off-by" if sob else "Acked-by"
+                text += f'{tag}: {config.name} <{config.email}>\n'
             text += line + "\n"
             last = line
 
@@ -145,12 +135,12 @@ class Patch:
             if m:
                 msg_commit = m.group(1)
                 if not self.commit or \
-                   re.match(r"^%s.*" % self.commit, msg_commit) is not None:
+                   re.match(rf'^{self.commit}.*', msg_commit) is not None:
                     self.commit = msg_commit
                 self.find_repo()
 
         if not self.repo:
-            f = self.find_repo()
+            self.find_repo()
 
         if self.repo in self.mainline_repo_list:
             self.in_mainline = True
@@ -185,9 +175,8 @@ class Patch:
         self.handle_merge()
 
     def from_file(self, pathname):
-        f = open(pathname, "r")
-        self.from_email(f.read())
-        f.close()
+        with open(pathname) as f:
+            self.from_email(f.read())
 
     def files(self):
         diffstat = patchops.get_diffstat(self.body())
@@ -199,6 +188,7 @@ class Patch:
             if not f:
                 return None
             return f
+        return None
 
     def find_commit(self):
         for repo in self.repo_list:
@@ -212,24 +202,23 @@ class Patch:
 
     def parse_commitdiff_header(self):
         url = self.message['X-Git-Url']
-        url = urllib.parse.unquote(url)
+        url = unquote(url)
 
         uc = urlparse(url)
         if not uc.scheme:
-            raise InvalidURLException("X-Git-Url provided but is not a URL (%s)" % url)
+            raise InvalidURLError(f'X-Git-Url provided but is not a URL ({url})')
 
         args = dict([x.split('=', 1) for x in uc.query.split(';')])
         if 'p' in args:
-            args['p'] = urllib.parse.unquote(args['p'])
+            args['p'] = unquote(args['p'])
 
         if uc.netloc == 'git.kernel.org':
             self.repo = None
-            self.repourl = 'git://%s/pub/scm/%s' % (uc.netloc, args['p'])
+            self.repourl = f'git://{uc.netloc}/pub/scm/{args["p"]}'
         # Add more special cases here
         else:
             self.repo = None
-            self.repourl = '%s//%s%s' % (uc.scheme, uc.netloc, \
-                                         uc.path + args['p'])
+            self.repourl = f'{uc.scheme}//{uc.netloc}{uc.path + args["p"]}'
         if args['h'] and not self.commit:
             self.commit = args['h']
         del self.message['X-Git-Url']
@@ -244,8 +233,7 @@ class Patch:
             if dirname:
                 filename = os.path.join(dirname, filename)
             return filename
-        else:
-            raise InvalidPatchException("Patch contains no Subject line")
+        raise InvalidPatchError("Patch contains no Subject line")
 
     def find_repo(self):
         if self.message['Git-repo'] or self.in_mainline:
@@ -269,19 +257,8 @@ class Patch:
                         self.repo = repo
                     return True
 
+        # XXX: raise an exception?
         return False
-
-    def extract(self, paths):
-        text = ""
-        chunk = ""
-        for line in self.message.get_payload().splitlines():
-            if _patch_start_re.match(line):
-                text += chunk
-                chunk = ""
-            chunk += line + "\n"
-
-        text += chunk
-        return text
 
     def header(self):
         in_body = False
@@ -312,10 +289,7 @@ class Patch:
     def file_in_path(filename, paths):
         if filename in paths:
             return True
-        for f in paths:
-            if f[-1:] == '/' and f in filename:
-                return True
-        return False
+        return any(f[-1:] == '/' and f in filename for f in paths)
 
     @staticmethod
     def shrink_chunk(chunk):
@@ -336,7 +310,7 @@ class Patch:
                     start = n - 3 # count this line
                     if start < 0:
                         if debug:
-                            print("resetting start(1) (%d, %d)" % (start, n))
+                            print(f'resetting start(1) ({start}, {n})')
                             print("----")
                             print(chunk)
                             print("----")
@@ -349,7 +323,7 @@ class Patch:
                     start = n - 3 # count this line
                     if start < 0:
                         if debug:
-                            print("resetting start(2) (%d, %d)" % (start, n))
+                            print(f'resetting start(2) ({start}, {n})')
                             print("----")
                             print(chunk)
                             print("----")
@@ -371,8 +345,7 @@ class Patch:
 
             if start >= 0 and end >= 0:
                 diff = end - start
-                text +=  "@@ -%d,%d +%d,%d @@\n" % \
-                    (start + 1, diff - added, start + 1, diff - removed)
+                text +=  f'@@ -{start+1},{diff-added} +{start+1},{diff-removed} @@\n'
                 text += "\n".join(lines[start:end])
                 text += '\n'
                 end = -1
@@ -383,12 +356,9 @@ class Patch:
         return text
 
     def handle_merge(self):
-        body = ""
         chunk = ""
         text = ""
-        
         in_chunk = False
-        in_patch = False
         lines = self.body().splitlines()
         for line in lines:
             if _patch_start_re.match(line):
@@ -397,7 +367,6 @@ class Patch:
                     chunk = ""
                 else:
                     chunk += line + "\n"
-                in_patch = True
                 in_chunk = False
             elif re.match(r"^@@@", line):
                 if in_chunk:
@@ -406,12 +375,11 @@ class Patch:
                     text += chunk
                 chunk = ""
                 in_chunk = True
+            elif in_chunk:
+                if line[1] == ' ' or line[1] == '+':
+                    chunk += line[0:1] + line[2:] + "\n"
             else:
-                if in_chunk:
-                    if line[1] == ' ' or line[1] == '+':
-                        chunk += line[0:1] + line[2:] + "\n"
-                else:
-                    chunk += line + "\n"
+                chunk += line + "\n"
 
         if in_chunk:
             text += Patch.shrink_chunk(chunk)
@@ -452,27 +420,26 @@ class Patch:
 
         if partial:
             commit = self.message['Git-commit']
-            if not '(partial)' in commit:
+            if '(partial)' not in commit:
                 self.message.replace_header('Git-commit',
-                                            '%s (partial)' % commit)
-            if exclude:
-                filtered_header = ' !'.join([''] + files)[1:]
-            else:
-                filtered_header = ' '.join(files)
+                                            f'{commit} (partial)')
+            filtered_header = ' !'.join(['', *files])[1:] if exclude else ' '.join(files)
 
             if 'Patch-filtered' in self.message:
                 h = self.message['Patch-filtered']
                 self.message.replace_header('Patch-filtered',
-                                            "%s %s" % (h, filtered_header))
+                                            f'{h} {filtered_header}')
             else:
                 self.message['Patch-filtered'] = filtered_header
         self.update_diffstat()
 
         if is_empty:
-            raise EmptyCommitException("commit is empty")
+            raise EmptyCommitError("commit is empty")
 
     def update_refs(self, refs):
-        if not 'References' in self.message:
+        if 'References' not in self.message:
             self.message.add_header('References', refs)
         else:
             self.message['References'] = refs
+
+# vim: sw=4 ts=4 et si:

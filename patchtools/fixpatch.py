@@ -12,7 +12,7 @@ __author__ = 'Jeff Mahoney'
 import os
 import sys
 from optparse import OptionParser
-from patchtools import PatchException
+from patchtools import PatchError
 from patchtools.patch import Patch
 from patchtools import __version__ as patchtools_version
 
@@ -21,15 +21,16 @@ def process_file(pathname, options):
     """Try to fix a patch file -- errors are ignored"""
     try:
         p = Patch()
-        f = open(pathname, "r")
-        p.from_email(f.read())
+        with open(pathname) as f:
+            p.from_email(f.read())
 
         if options.name_only:
+            # print the new name and return
             suffix=""
             if options.suffix:
                 suffix = ".patch"
             fn = p.get_pathname()
-            print("{}{}".format(fn, suffix))
+            print(f'{fn}{suffix}')
             return
 
         if options.update_only:
@@ -65,21 +66,22 @@ def process_file(pathname, options):
         if options.no_rename:
             fn = pathname
         else:
-            fn = "{}{}".format(p.get_pathname(), suffix)
+            fn = f'{p.get_pathname()}{suffix}'
             dirname = os.path.dirname(pathname)
             if dirname != '':
-                fn = "{}/{}".format(dirname, fn)
+                fn = f'{dirname}/{fn}'
             if fn != pathname and os.path.exists(fn) and not options.force:
-                print("%s already exists." % fn, file=sys.stderr)
+                print(f'{fn} already exists.', file=sys.stderr)
                 return
         print(fn)
-        f = open(fn, "w")
-        print(p.message.as_string(unixfrom=False), file=f)
-        f.close()
+        with open(fn, "w") as f:
+            print(p.message.as_string(unixfrom=False), file=f)
         if fn != pathname:
             os.unlink(pathname)
-    except PatchException as e:
+    except PatchError as e:
         print(e, file=sys.stderr)
+
+    return
 
 
 def main():

@@ -1,4 +1,3 @@
-# vim: sw=4 ts=4 et si:
 """
 Represent Git Repos
 """
@@ -14,7 +13,7 @@ from patchtools.command import run_command
 MAINLINE_URLS = [ """git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git""",
                   """git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git""",
                   """https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git""",
-                  """https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git"""
+                  """https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git""",
                 ]
 
 def get_git_repo_url(gitdir):
@@ -47,26 +46,26 @@ class Config:
 
     def read_configs(self):
         config = configparser.ConfigParser()
-        files_read = config.read([ '/etc/patch.cfg',
-                                   '%s/etc/patch.cfg' % site.USER_BASE,
-                                   os.path.expanduser('~/.patch.cfg'),
-                                   './patch.cfg'])
+        config.read(['/etc/patch.cfg',
+                     f'{site.USER_BASE}/etc/patch.cfg',
+                     os.path.expanduser('~/.patch.cfg'),
+                     './patch.cfg'])
         try:
             self.repos = config.get('repositories', 'search').split()
             repos = config.get('repositories', 'mainline').split()
             self.mainline_repos += repos
-        except (configparser.NoOptionError, configparser.NoSectionError) as e:
+        except (configparser.NoOptionError, configparser.NoSectionError):
             pass
 
         try:
             self.name = config.get('contact', 'name')
-        except (configparser.NoOptionError, configparser.NoSectionError) as e:
+        except (configparser.NoOptionError, configparser.NoSectionError):
             pass
 
         try:
             self.emails = config.get('contact', 'email').split()
             self.email = self.emails[0]
-        except (configparser.NoOptionError, configparser.NoSectionError) as e:
+        except (configparser.NoOptionError, configparser.NoSectionError):
             pass
 
     def merge_mainline_repos(self):
@@ -78,16 +77,17 @@ class Config:
     def _canonicalize(self, path):
         if path[0] == '/':
             return os.path.realpath(path)
-        elif path == ".":
+        if path == ".":
             return os.getcwd()
-        else:
-            return path
+        return path
 
     def get_repos(self):
-        return list(self._canonicalize(r) for r in self.repos)
+        return [self._canonicalize(r) for r in self.repos]
 
     def get_mainline_repos(self):
-        return list(self._canonicalize(r) for r in self.mainline_repos)
+        return [self._canonicalize(r) for r in self.mainline_repos]
 
     def get_default_mainline_repo(self):
         return self._canonicalize(self.mainline_repos[0])
+
+# vim: sw=4 ts=4 et si:

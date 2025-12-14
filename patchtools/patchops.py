@@ -1,9 +1,10 @@
-# vim: sw=4 ts=4 et si:
 """
+General Patch operations
+
 Support package for doing SUSE Patch operations
 """
 
-from patchtools import PatchException
+from patchtools import PatchError
 from patchtools.command import run_command
 import re
 
@@ -15,9 +16,8 @@ def key_version(tag):
         patch = int(m.group(2))
         if m.group(5):
             return (major, minor, patch, False, int(m.group(5)))
-        else:
-            mgroup4=int(m.group(4)) if m.group(4) else 0
-            return (major, minor, patch, True, mgroup4)
+        mgroup4 = int(m.group(4)) if m.group(4) else 0
+        return (major, minor, patch, True, mgroup4)
 
     # We purposely ignore x.y.z tags since those are from -stable and
     # will never be used in a mainline tag.
@@ -26,13 +26,15 @@ def key_version(tag):
         major = int(m.group(1))
         minor = int(m.group(2))
         if m.group(4):
-                return (major, minor, 0, False, int(m.group(4)))
+            return (major, minor, 0, False, int(m.group(4)))
         return (major, minor, 0, True, "")
 
     return ()
 
-class LocalCommitException(PatchException):
+
+class LocalCommitError(PatchError):
     pass
+
 
 def get_tag(commit, repo):
     command = f"(cd {repo};git name-rev --refs=refs/tags/v* {commit})"
@@ -62,20 +64,18 @@ def get_next_tag(repo):
     if m:
         # Post-release commit with no rc, it'll be rc1
         if m.group(3) == "":
-            nexttag = "v%s.%d-rc1" % (m.group(1), int(m.group(2)) + 1)
+            nexttag = f'v{m.group(1)}.{int(m.group(2))+1}-rc1'
         else:
-            nexttag = "v%s.%d or v%s.%s-rc%d (next release)" % \
-                      (m.group(1), int(m.group(2)), m.group(1),
-                       m.group(2), int(m.group(4)) + 1)
+            nexttag = f'v{m.group(1)}.{int(m.group(2))} or v{m.group(1)}.{m.group(2)}-rc{int(m.group(4))+1} (next release)'
         return nexttag
 
     return None
 
 def get_diffstat(message):
-    return run_command("diffstat -p1", input=message)
+    return run_command("diffstat -p1", our_input=message)
 
-def get_git_repo_url(dir):
-    command = f"(cd {dir}; git remote show origin -n)"
+def get_git_repo_url(a_dir):
+    command = f'(cd {a_dir}; git remote show origin -n)'
     output = run_command(command)
     for line in output.split('\n'):
         m = re.search(r"URL:\s+(\S+)", line)
@@ -85,15 +85,12 @@ def get_git_repo_url(dir):
     return None
 
 def confirm_commit(commit, repo):
-    command = f"cd {repo} ; git rev-list HEAD --not --remotes $(git config --get branch.$(git symbolic-ref --short HEAD).remote)"
+    command = f"cd {repo};git rev-list HEAD --not --remotes $(git config --get branch.$(git symbolic-ref --short HEAD).remote)"
     out = run_command(command)
     if out == "":
         return True
-
     commits = out.split()
-    if commit in commits:
-        return False
-    return True
+    return commit not in commits
 
 def canonicalize_commit(commit, repo):
     return run_command(f"cd {repo} ; git show -s {commit}^{{}} --pretty=%H")
@@ -105,7 +102,7 @@ def get_commit(commit, repo, force=False):
         return None
 
     if not force and not confirm_commit(commit, repo):
-        raise LocalCommitException("Commit is not in the remote repository. Use -f to override.")
+        raise LocalCommitError("Commit is not in the remote repository. Use -f to override.")
 
     return data
 
@@ -117,9 +114,9 @@ def safe_filename(name, keep_non_patch_brackets = True):
     # to remove noise from the subject line.
     # keep_non_patch_brackets=True is the equivalent of git am -b
     if keep_non_patch_brackets:
-        name = re.sub(r'(([Rr][Ee]:|\[PATCH[^]]*\])[ \t]*)*', '', name, 1)
+        name = re.sub(r'(([Rr][Ee]:|\[PATCH[^]]*\])[ \t]*)*', '', name, count=1)
     else:
-        name = re.sub(r'(([Rr][Ee]:|\[[^]]*\])[ \t]*)*', '', name, 1)
+        name = re.sub(r'(([Rr][Ee]:|\[[^]]*\])[ \t]*)*', '', name, count=1)
 
     # This mimics the filters that git-format-patch applies prior to adding
     # prefixes or suffixes.
@@ -127,3 +124,5 @@ def safe_filename(name, keep_non_patch_brackets = True):
     name = re.sub(r'-+', '-', name)
     name = re.sub(r'\.+', '.', name)
     return name.strip('-. ')
+
+# vim: sw=4 ts=4 et si:
