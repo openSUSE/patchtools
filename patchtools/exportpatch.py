@@ -8,19 +8,14 @@ __author__ = 'Jeff Mahoney'
 
 import os
 import sys
-from patchtools import PatchError
-from patchtools.patch import Patch, EmptyCommitError
-from patchtools import __version__ as patchtools_version
 from optparse import OptionParser
-import os
 
+from patchtools import PatchError
+from patchtools import __version__ as patchtools_version
+from patchtools.patch import EmptyCommitError, Patch
 
-# default: do not write out a patch file
-WRITE=False
-
-# default directory where patch gets written
-DIR="."
-
+WRITE_PATCHFILE_DEFAULT = False
+WRITE_PATCHFILE_DIR_DEFAULT = "."
 
 def export_patch(commit, options, prefix, suffix):
     try:
@@ -64,14 +59,13 @@ def export_patch(commit, options, prefix, suffix):
     print(f'Could not locate commit "{commit}"; Skipping.', file=sys.stderr)
     return 1
 
-
 def main():
     """Export one or more patches from git, by commit hash"""
     parser = OptionParser(version='%prog ' + patchtools_version,
                           usage='%prog [options] <LIST OF COMMIT HASHES> --  export patch with proper patch headers')
     parser.add_option("-w", "--write", action="store_true",
                       help="write patch file(s) instead of stdout [default is %default]",
-                      default=WRITE)
+                      default=WRITE_PATCHFILE_DEFAULT)
     parser.add_option("-s", "--suffix", action="store_true",
                       help="when used with -w, append .patch suffix to filenames.",
                       default=False)
@@ -85,13 +79,16 @@ def main():
                       help="Start numbering the patches with number instead of 1",
                       default=1)
     parser.add_option("-d", "--dir", action="store",
-                      help="write patch to this directory (default '.')", default=DIR)
+                      help="write patch to this directory (default '.')",
+                      default=WRITE_PATCHFILE_DIR_DEFAULT)
     parser.add_option("-f", "--force", action="store_true",
-                      help="write over existing patch or export commit that only exists in local repo", default=False)
+                      help="write over existing patch or export commit that only exists in local repo",
+                      default=False)
     parser.add_option("-D", "--debug", action="store_true",
                       help="set debug mode", default=False)
     parser.add_option("-F", "--reference", action="append",
-                      help="add reference tag. This option can be specified multiple times.", default=None)
+                      help="add reference tag. This option can be specified multiple times.",
+                      default=None)
     parser.add_option("-x", "--extract", action="append",
                       help="extract specific parts of the commit; using a path that ends with / includes all files under that hierarchy. This option can be specified multiple times.",
                       default=None)

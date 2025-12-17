@@ -4,12 +4,13 @@ The 'Patch' class.
 Support package for doing SUSE Patch operations
 """
 
-from patchtools import patchops, config, PatchError
-import re
+import email.parser
 import os
 import os.path
-import email.parser
-from urllib.parse import urlparse, unquote
+import re
+from urllib.parse import unquote, urlparse
+
+from patchtools import PatchError, config, patchops
 
 _patch_start_re = re.compile(r"^(---|\*\*\*|Index:)[ \t][^ \t]|^diff -|^index [0-9a-f]{7}")
 

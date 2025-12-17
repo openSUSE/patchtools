@@ -2,11 +2,11 @@
 Represent Git Repos
 """
 
+import configparser
 import os
 import pwd
-import site
-import configparser
 import re
+import site
 
 from patchtools.command import run_command
 
@@ -15,6 +15,7 @@ MAINLINE_URLS = [ """git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linu
                   """https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git""",
                   """https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git""",
                 ]
+
 
 def get_git_repo_url(gitdir):
     command = f"(cd {gitdir}; git remote show origin -n)"

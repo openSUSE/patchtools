@@ -4,9 +4,11 @@ General Patch operations
 Support package for doing SUSE Patch operations
 """
 
+import re
+
 from patchtools import PatchError
 from patchtools.command import run_command
-import re
+
 
 def key_version(tag):
     m = re.match(r"v2\.(\d+)\.(\d+)(\.(\d+)|-rc(\d+)|)", tag)

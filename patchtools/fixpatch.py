@@ -8,13 +8,13 @@ subject found in the patch itself.
 
 __author__ = 'Jeff Mahoney'
 
-
 import os
 import sys
 from optparse import OptionParser
+
 from patchtools import PatchError
-from patchtools.patch import Patch
 from patchtools import __version__ as patchtools_version
+from patchtools.patch import Patch
 
 
 def process_file(pathname, options):
@@ -82,7 +82,6 @@ def process_file(pathname, options):
         print(e, file=sys.stderr)
 
     return
-
 
 def main():
     """Fix one or more patch files"""

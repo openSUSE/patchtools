@@ -18,8 +18,8 @@ __all__ = [
         'config',
         'exportpatch',
         'fixpatch',
-        'patchops',
         'patch',
+        'patchops',
         ]
 
 # vim: sw=4 ts=4 et si:
