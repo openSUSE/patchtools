@@ -72,27 +72,28 @@ select = [
     "PTH123", # prefer Path.open() over builtin open()
     # ignore these?
     "I001", # Unsorted imports
-    "E722",  # TODO do not use bare 'except'
+    "E722",  # do not use bare 'except'
     "S104",  # Possible binding to all interfaces (0.0.0.0)
     "B904",  # raise-without-from-inside-except
-    "ARG002", "PLR6301",  # TODO Unused self, parameter in methods definitions
+    "ARG002", "PLR6301",  # Unused self, parameter in methods definitions
     "PLR09",  # Too many branches/statements/arguments
-    "PLW1514", # TODO `open` in text mode without explicit `encoding` argument
+    "PLW1514", # `open` in text mode without explicit `encoding` argument
 ]
 
 ignore = [
     "S602", # subprocess called with shell=True
     "S603", # unsafe subprocess
     "S404", # subprocess is insecure
-    "PLR6301", # XXX: because some "clean()" methods do nothing, for now
+    "PLR6301", # because some "clean()" methods do nothing, for now
     "D400", # doc strings shouldn't need a damn period -- it's not prose
     "D415", # doc strings also don't need '!' or '?'
     "E501", # line too long
     "PLR0912", # too many branches -- it seems a little arbitrary
     "PLR0915", # too many statements -- it seems a little arbitrary
-    "RUF012",  # TODO Mutable class attributes should be annotated with `typing.ClassVar`
+    "RUF012", # Mutable class attributes should be annotated with `typing.ClassVar`
+    "SIM105", # for now allow exception suppression the old-fashioned way
 ]
 
 [tool.ruff.lint.flake8-quotes]
 # Double quotes are currently prevalent in the codebase. Not being checked.
-inline-quotes = "double"
+inline-quotes = "single"
