@@ -16,6 +16,43 @@ it to fit your site.
 
 # Installation
 
-To install this code on your system manually, you can use:
+To install this code on your system manually, you can use
+something like the following:
 
     python3 -mpip install --prefix=/usr/local .
+
+You will need permission to write in the /usr/local hierachy to do
+this, and you will have to ensure any "patchtools" package on your
+system is removed first.
+
+Alternatively, you can install using a virtual environment. To do this,
+create a virtual environment using something like:
+
+    python3 -mvenv myvenv
+
+This creates a virtual environment in the "myvenv" subdirectory. To
+activate this, run (from the shell):
+
+    source myvenv/bin/activate
+
+Then, to install in this new virtual environment, run:
+
+    python3 -mpip install --editable .
+
+Now, if you run "which exportpatch", for example, you should
+see the just-installed version. If you already have this tool installed
+on your system, then the newly-installed version should show up first
+in the list. When you are done, run "deactivate" to exit the virtual
+environment.
+
+# Testing
+
+There is a "test" subdirectory, where you can find more information
+on selftests.
+
+In addition, whenever changes are made to the code, you can use the
+"ruff" tool to check that your changes match the existing configuration.
+For example, you can run:
+
+    ruff check --target-version py311 --config pyproject.toml
+
