@@ -69,10 +69,11 @@ select = [
     "PERF", # Perflint
     "FURB", # refurb
     "RUF",  # Ruff
+    "PTH123", # prefer Path.open() over builtin open()
     # ignore these?
+    "I001", # Unsorted imports
     "E722",  # TODO do not use bare 'except'
     "S104",  # Possible binding to all interfaces (0.0.0.0)
-    "RUF012",  # TODO Mutable class attributes should be annotated with `typing.ClassVar`
     "B904",  # raise-without-from-inside-except
     "ARG002", "PLR6301",  # TODO Unused self, parameter in methods definitions
     "PLR09",  # Too many branches/statements/arguments
@@ -80,12 +81,16 @@ select = [
 ]
 
 ignore = [
-    "I001", # Unsorted imports
+    "S602", # subprocess called with shell=True
     "S603", # unsafe subprocess
     "S404", # subprocess is insecure
     "PLR6301", # XXX: because some "clean()" methods do nothing, for now
     "D400", # doc strings shouldn't need a damn period -- it's not prose
     "D415", # doc strings also don't need '!' or '?'
+    "E501", # line too long
+    "PLR0912", # too many branches -- it seems a little arbitrary
+    "PLR0915", # too many statements -- it seems a little arbitrary
+    "RUF012",  # TODO Mutable class attributes should be annotated with `typing.ClassVar`
 ]
 
 [tool.ruff.lint.flake8-quotes]
