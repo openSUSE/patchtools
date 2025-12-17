@@ -54,5 +54,5 @@ In addition, whenever changes are made to the code, you can use the
 "ruff" tool to check that your changes match the existing configuration.
 For example, you can run:
 
-    ruff check --target-version py311 --config pyproject.toml
+    ruff check --target-version py311 --config pyproject.toml --preview
 
