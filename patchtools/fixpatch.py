@@ -11,6 +11,7 @@ __author__ = 'Jeff Mahoney'
 import os
 import sys
 from optparse import OptionParser
+from pathlib import Path
 
 from patchtools import PatchError
 from patchtools import __version__ as patchtools_version
@@ -21,7 +22,7 @@ def process_file(pathname, options):
     """Try to fix a patch file -- errors are ignored"""
     try:
         p = Patch()
-        with open(pathname) as f:
+        with Path(pathname).open('r') as f:
             p.from_email(f.read())
 
         if options.name_only:
@@ -74,7 +75,7 @@ def process_file(pathname, options):
                 print(f'{fn} already exists.', file=sys.stderr)
                 return
         print(fn)
-        with open(fn, "w") as f:
+        with Path(fn).open('w') as f:
             print(p.message.as_string(unixfrom=False), file=f)
         if fn != pathname:
             os.unlink(pathname)

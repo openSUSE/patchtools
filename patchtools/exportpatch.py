@@ -9,6 +9,7 @@ __author__ = 'Jeff Mahoney'
 import os
 import sys
 from optparse import OptionParser
+from pathlib import Path
 
 from patchtools import PatchError
 from patchtools import __version__ as patchtools_version
@@ -47,7 +48,7 @@ def export_patch(commit, options, prefix, suffix):
                 print(f'{f} already exists. Using {fn}', file=sys.stderr)
             print(os.path.basename(fn))
             try:
-                with open(fn, "w") as f:
+                with Path(fn).open('w') as f:
                     print(p.message.as_string(False), file=f)
             except Exception as e:
                 print(f'Failed to write {fn}: {e}', file=sys.stderr)

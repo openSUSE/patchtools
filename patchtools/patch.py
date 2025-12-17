@@ -8,6 +8,7 @@ import email.parser
 import os
 import os.path
 import re
+from pathlib import Path
 from urllib.parse import unquote, urlparse
 
 from patchtools import PatchError, config, patchops
@@ -176,7 +177,7 @@ class Patch:
         self.handle_merge()
 
     def from_file(self, pathname):
-        with open(pathname) as f:
+        with Path(pathname).open('r') as f:
             self.from_email(f.read())
 
     def files(self):

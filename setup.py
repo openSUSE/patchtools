@@ -10,6 +10,7 @@ the 'clean' command.
 
 import os
 import shutil
+from pathlib import Path
 
 from setuptools import Command, setup
 
@@ -42,7 +43,7 @@ class CleanCommand(Command):
 def create_script_frontend(mod_name):
     """Create a front end for a script module"""
     script_dest = f'scripts/{mod_name}'
-    with open(script_dest, 'w', encoding='UTF-8') as d:
+    with Path(script_dest).open('w', encoding='UTF-8') as d:
         print('#!/usr/bin/python3', file=d)
         print('import re', file=d)
         print('import sys', file=d)
