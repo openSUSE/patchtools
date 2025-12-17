@@ -50,7 +50,7 @@ def create_script_frontend(mod_name):
         print(f'from patchtools.{mod_name} import main', file=d)
         print("if __name__ == '__main__':", file=d)
         print('    sys.exit(main())', file=d)
-    os.chmod(script_dest, mode=0o755)
+    os.chmod(script_dest, mode=0o755)   # noqa: S103
 
 
 def setup_scripts():

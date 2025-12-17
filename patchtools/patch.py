@@ -335,7 +335,7 @@ class Patch:
                 count = 0
             else:
                 count += 1
-                if start >= 0 and end < 0 and (count > 3 or n +1 == len(lines)):
+                if start >= 0 and end < 0 and (count > 3 or n +1 == len(lines)):   # noqa: PLR2004
                     end = n # count this line
                     if end >= len(lines):
                         if debug:
