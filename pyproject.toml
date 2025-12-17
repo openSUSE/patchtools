@@ -55,6 +55,7 @@ select = [
     "ISC",  # flake8-implicit-str-concat
     "ICN",  # flake8-import-conventions
     "PIE",  # flake8-pie
+    "Q000", # use the proper quotes
     "Q003", # flake8-quotes avoidable-escaped-quote
     "Q004", # flake8-quotes unnecessary-escaped-quote
     "RSE",  # flake8-raise

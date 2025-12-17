@@ -16,7 +16,7 @@ from patchtools import __version__ as patchtools_version
 from patchtools.patch import EmptyCommitError, Patch
 
 WRITE_PATCHFILE_DEFAULT = False
-WRITE_PATCHFILE_DIR_DEFAULT = "."
+WRITE_PATCHFILE_DIR_DEFAULT = '.'
 
 def export_patch(commit, options, prefix, suffix):
     try:
@@ -64,51 +64,51 @@ def main():
     """Export one or more patches from git, by commit hash"""
     parser = OptionParser(version='%prog ' + patchtools_version,
                           usage='%prog [options] <LIST OF COMMIT HASHES> --  export patch with proper patch headers')
-    parser.add_option("-w", "--write", action="store_true",
-                      help="write patch file(s) instead of stdout [default is %default]",
+    parser.add_option('-w', '--write', action='store_true',
+                      help='write patch file(s) instead of stdout [default is %default]',
                       default=WRITE_PATCHFILE_DEFAULT)
-    parser.add_option("-s", "--suffix", action="store_true",
-                      help="when used with -w, append .patch suffix to filenames.",
+    parser.add_option('-s', '--suffix', action='store_true',
+                      help='when used with -w, append .patch suffix to filenames.',
                       default=False)
-    parser.add_option("-n", "--numeric", action="store_true",
-                      help="when used with -w, prepend order numbers to filenames.",
+    parser.add_option('-n', '--numeric', action='store_true',
+                      help='when used with -w, prepend order numbers to filenames.',
                       default=False)
-    parser.add_option("--num-width", type="int", action="store",
-                      help="when used with -n, set the width of the order numbers",
+    parser.add_option('--num-width', type='int', action='store',
+                      help='when used with -n, set the width of the order numbers',
                       default=4)
-    parser.add_option("-N", "--first-number", action="store",
-                      help="Start numbering the patches with number instead of 1",
+    parser.add_option('-N', '--first-number', action='store',
+                      help='Start numbering the patches with number instead of 1',
                       default=1)
-    parser.add_option("-d", "--dir", action="store",
+    parser.add_option('-d', '--dir', action='store',
                       help="write patch to this directory (default '.')",
                       default=WRITE_PATCHFILE_DIR_DEFAULT)
-    parser.add_option("-f", "--force", action="store_true",
-                      help="write over existing patch or export commit that only exists in local repo",
+    parser.add_option('-f', '--force', action='store_true',
+                      help='write over existing patch or export commit that only exists in local repo',
                       default=False)
-    parser.add_option("-D", "--debug", action="store_true",
-                      help="set debug mode", default=False)
-    parser.add_option("-F", "--reference", action="append",
-                      help="add reference tag. This option can be specified multiple times.",
+    parser.add_option('-D', '--debug', action='store_true',
+                      help='set debug mode', default=False)
+    parser.add_option('-F', '--reference', action='append',
+                      help='add reference tag. This option can be specified multiple times.',
                       default=None)
-    parser.add_option("-x", "--extract", action="append",
-                      help="extract specific parts of the commit; using a path that ends with / includes all files under that hierarchy. This option can be specified multiple times.",
+    parser.add_option('-x', '--extract', action='append',
+                      help='extract specific parts of the commit; using a path that ends with / includes all files under that hierarchy. This option can be specified multiple times.',
                       default=None)
-    parser.add_option("-X", "--exclude", action="append",
-                      help="exclude specific parts of the commit; using a path that ends with / excludes all files under that hierarchy. This option can be specified multiple times.",
+    parser.add_option('-X', '--exclude', action='append',
+                      help='exclude specific parts of the commit; using a path that ends with / excludes all files under that hierarchy. This option can be specified multiple times.',
                       default=None)
-    parser.add_option("-S", "--signed-off-by", action="store_true",
+    parser.add_option('-S', '--signed-off-by', action='store_true',
                       default=False,
-                      help="Use Signed-off-by instead of Acked-by")
+                      help='Use Signed-off-by instead of Acked-by')
     (options, args) = parser.parse_args()
 
     if not args:
-        parser.error("Must supply patch hash(es)")
+        parser.error('Must supply patch hash(es)')
         return 1
 
     try:
         n = int(options.first_number)
     except ValueError:
-        print("option -N needs a number")
+        print('option -N needs a number')
         return 1
 
     max_val=9999
@@ -116,17 +116,17 @@ def main():
         print(f'The starting number + commits needs to be in the range 0 - {max_val}')
         return 1
 
-    suffix = ".patch" if options.suffix else ""
+    suffix = '.patch' if options.suffix else ''
 
     num_width = 4
-    max_width=5
+    max_width = 5
     if options.num_width:
         _n = int(options.num_width)
         if _n > 0 and _n < max_width:
             num_width = _n
 
     for commit in args:
-        prefix = "{0:0{1}}-".format(n, num_width) if options.numeric else ""
+        prefix = '{0:0{1}}-'.format(n, num_width) if options.numeric else ''
 
         res = export_patch(commit, options, prefix, suffix)
         if res != 0:

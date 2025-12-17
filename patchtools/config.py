@@ -18,17 +18,17 @@ MAINLINE_URLS = [ """git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linu
 
 
 def get_git_repo_url(gitdir):
-    command = f"(cd {gitdir}; git remote show origin -n)"
+    command = f'(cd {gitdir}; git remote show origin -n)'
     output = run_command(command)
     for line in output.split('\n'):
-        m = re.search(r"URL:\s+(\S+)", line)
+        m = re.search(r'URL:\s+(\S+)', line)
         if m:
             return m.group(1)
 
     return None
 
 def get_git_config(gitdir, var):
-    command = f"(cd {gitdir}; git config {var})"
+    command = f'(cd {gitdir}; git config {var})'
     return run_command(command).strip()
 
 # We deliberately don't catch exceptions when the option is mandatory
@@ -38,9 +38,9 @@ class Config:
         self.repos = [ os.getcwd() ]
         self.mainline_repos = MAINLINE_URLS
         self.merge_mainline_repos()
-        self.email = get_git_config(os.getcwd(), "user.email")
+        self.email = get_git_config(os.getcwd(), 'user.email')
         self.emails = [self.email]
-        self.name = pwd.getpwuid(os.getuid()).pw_gecos.split(",")[0].strip()
+        self.name = pwd.getpwuid(os.getuid()).pw_gecos.split(',')[0].strip()
 
         self.read_configs()
         self.merge_mainline_repos()
@@ -78,7 +78,7 @@ class Config:
     def _canonicalize(self, path):
         if path[0] == '/':
             return os.path.realpath(path)
-        if path == ".":
+        if path == '.':
             return os.getcwd()
         return path
 

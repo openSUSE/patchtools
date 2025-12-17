@@ -27,9 +27,9 @@ def process_file(pathname, options):
 
         if options.name_only:
             # print the new name and return
-            suffix=""
+            suffix = ''
             if options.suffix:
-                suffix = ".patch"
+                suffix = '.patch'
             fn = p.get_pathname()
             print(f'{fn}{suffix}')
             return
@@ -42,7 +42,8 @@ def process_file(pathname, options):
             options.no_ack = True
             options.no_diffstat = True
             if options.reference:
-                print("References won't be updated in header-only mode.", file=sys.stderr)
+                print('References will not be updated in header-only mode.',
+                      file=sys.stderr)
                 options.reference = None
 
         if not options.no_diffstat:
@@ -60,9 +61,7 @@ def process_file(pathname, options):
             print(p.message.as_string(unixfrom=False))
             return
 
-        suffix=""
-        if options.suffix:
-            suffix = ".patch"
+        suffix = '.patch' if options.suffix else ''
 
         if options.no_rename:
             fn = pathname
@@ -87,37 +86,36 @@ def process_file(pathname, options):
 def main():
     """Fix one or more patch files"""
     parser = OptionParser(version='%prog ' + patchtools_version)
-    parser.add_option("-n", "--dry-run", action="store_true", default=False,
-                      help="Output results to stdout but don't commit change")
-    parser.add_option("-N", "--no-ack", action="store_true", default=False,
-                      help="Don't add Acked-by tag (will add by default)")
-    parser.add_option("-D", "--no-diffstat", action="store_true", default=False,
-                      help="Don't add the diffstat to the patch")
-    parser.add_option("-r", "--no-rename", action="store_true", default=False,
-                      help="Don't rename the patch")
-    parser.add_option("-f", "--force", action="store_true", default=False,
-                      help="Overwrite patch if it exists already")
-    parser.add_option("-H", "--header-only", action="store_true", default=False,
-                      help="Only update the patch headers, don't do Acked-by or Diffstat")
-    parser.add_option("-U", "--update-only", action="store_true", default=False,
-                      help="Update the patch headers but don't rename (-Hr)")
-    parser.add_option("-R", "--name-only", action="store_true", default=False,
-                      help="Print the new filename for the patch but don't change anything")
-    parser.add_option("-F", "--reference", action="append", default=None,
-                      help="add reference tag")
-    parser.add_option("-S", "--signed-off-by", action="store_true",
-              default=False,
-              help="Use Signed-off-by instead of Acked-by")
-    parser.add_option("-M", "--mainline", action="append", default=None,
-                      help="Add dummy Patch-mainline tag")
-    parser.add_option("-s", "--suffix", action="store_true",
-                      help="when used with -w, append .patch suffix to filenames.",
+    parser.add_option('-n', '--dry-run', action='store_true', default=False,
+                      help='Output results to stdout but do not commit change')
+    parser.add_option('-N', '--no-ack', action='store_true', default=False,
+                      help='Do not add Acked-by tag (will add by default)')
+    parser.add_option('-D', '--no-diffstat', action='store_true', default=False,
+                      help='Do not add the diffstat to the patch')
+    parser.add_option('-r', '--no-rename', action='store_true', default=False,
+                      help='Do not rename the patch')
+    parser.add_option('-f', '--force', action='store_true', default=False,
+                      help='Overwrite patch if it exists already')
+    parser.add_option('-H', '--header-only', action='store_true', default=False,
+                      help='Only update the patch headers, do not do Acked-by or Diffstat')
+    parser.add_option('-U', '--update-only', action='store_true', default=False,
+                      help='Update the patch headers but do not rename (-Hr)')
+    parser.add_option('-R', '--name-only', action='store_true', default=False,
+                      help='Print the new filename for the patch but do not change anything')
+    parser.add_option('-F', '--reference', action='append', default=None,
+                      help='add reference tag')
+    parser.add_option('-S', '--signed-off-by', action='store_true', default=False,
+                      help='Use Signed-off-by instead of Acked-by')
+    parser.add_option('-M', '--mainline', action='append', default=None,
+                      help='Add dummy Patch-mainline tag')
+    parser.add_option('-s', '--suffix', action='store_true',
+                      help='when used with -w, append .patch suffix to filenames.',
                       default=False)
 
     (options, args) = parser.parse_args()
 
     if not args:
-        parser.error("Must supply patch filename(s)")
+        parser.error('Must supply patch filename(s)')
         return 1
 
     for pathname in args:

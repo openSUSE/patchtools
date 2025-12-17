@@ -11,7 +11,7 @@ from patchtools.command import run_command
 
 
 def key_version(tag):
-    m = re.match(r"v2\.(\d+)\.(\d+)(\.(\d+)|-rc(\d+)|)", tag)
+    m = re.match(r'v2\.(\d+)\.(\d+)(\.(\d+)|-rc(\d+)|)', tag)
     if m:
         major = 2
         minor = int(m.group(1))
@@ -23,13 +23,13 @@ def key_version(tag):
 
     # We purposely ignore x.y.z tags since those are from -stable and
     # will never be used in a mainline tag.
-    m = re.match(r"v(\d+)\.(\d+)(-rc(\d+)|)", tag)
+    m = re.match(r'v(\d+)\.(\d+)(-rc(\d+)|)', tag)
     if m:
         major = int(m.group(1))
         minor = int(m.group(2))
         if m.group(4):
             return (major, minor, 0, False, int(m.group(4)))
-        return (major, minor, 0, True, "")
+        return (major, minor, 0, True, '')
 
     return ()
 
@@ -39,15 +39,15 @@ class LocalCommitError(PatchError):
 
 
 def get_tag(commit, repo):
-    command = f"(cd {repo};git name-rev --refs=refs/tags/v* {commit})"
+    command = f'(cd {repo};git name-rev --refs=refs/tags/v* {commit})'
     tag = run_command(command)
-    if tag == "":
+    if tag == '':
         return None
 
-    m = re.search(r"tags/([a-zA-Z0-9\.-]+)\~?\S*$", tag)
+    m = re.search(r'tags/([a-zA-Z0-9\.-]+)\~?\S*$', tag)
     if m:
         return m.group(1)
-    m = re.search(r"(undefined)", tag)
+    m = re.search(r'(undefined)', tag)
     if m:
         return m.group(1)
     return None
@@ -55,17 +55,17 @@ def get_tag(commit, repo):
 def get_next_tag(repo):
     command = f"(cd {repo} ; git tag -l 'v[0-9]*')"
     tag = run_command(command)
-    if tag == "":
+    if tag == '':
         return None
 
     lines = tag.split()
     lines.sort(key=key_version)
     lasttag = lines[len(lines) - 1]
 
-    m = re.search(r"v([0-9]+)\.([0-9]+)(|-rc([0-9]+))$", lasttag)
+    m = re.search(r'v([0-9]+)\.([0-9]+)(|-rc([0-9]+))$', lasttag)
     if m:
         # Post-release commit with no rc, it'll be rc1
-        if m.group(3) == "":
+        if m.group(3) == '':
             nexttag = f'v{m.group(1)}.{int(m.group(2))+1}-rc1'
         else:
             nexttag = f'v{m.group(1)}.{int(m.group(2))} or v{m.group(1)}.{m.group(2)}-rc{int(m.group(4))+1} (next release)'
@@ -74,37 +74,37 @@ def get_next_tag(repo):
     return None
 
 def get_diffstat(message):
-    return run_command("diffstat -p1", our_input=message)
+    return run_command('diffstat -p1', our_input=message)
 
 def get_git_repo_url(a_dir):
     command = f'(cd {a_dir}; git remote show origin -n)'
     output = run_command(command)
     for line in output.split('\n'):
-        m = re.search(r"URL:\s+(\S+)", line)
+        m = re.search(r'URL:\s+(\S+)', line)
         if m:
             return m.group(1)
 
     return None
 
 def confirm_commit(commit, repo):
-    command = f"cd {repo};git rev-list HEAD --not --remotes $(git config --get branch.$(git symbolic-ref --short HEAD).remote)"
+    command = f'cd {repo};git rev-list HEAD --not --remotes $(git config --get branch.$(git symbolic-ref --short HEAD).remote)'
     out = run_command(command)
-    if out == "":
+    if out == '':
         return True
     commits = out.split()
     return commit not in commits
 
 def canonicalize_commit(commit, repo):
-    return run_command(f"cd {repo} ; git show -s {commit}^{{}} --pretty=%H")
+    return run_command(f'cd {repo} ; git show -s {commit}^{{}} --pretty=%H')
 
 def get_commit(commit, repo, force=False):
-    command = f"cd {repo}; git diff-tree --no-renames --pretty=email -r -p --cc --stat {commit}"
+    command = f'cd {repo}; git diff-tree --no-renames --pretty=email -r -p --cc --stat {commit}'
     data = run_command(command)
-    if data == "":
+    if data == '':
         return None
 
     if not force and not confirm_commit(commit, repo):
-        raise LocalCommitError("Commit is not in the remote repository. Use -f to override.")
+        raise LocalCommitError('Commit is not in the remote repository. Use -f to override.')
 
     return data
 
