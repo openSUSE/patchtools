@@ -6,7 +6,7 @@ Support package for doing SUSE Patch operations
 
 import re
 
-from patchtools import PatchError
+from patchtools.patcherror import PatchError
 from patchtools.command import run_command
 
 
@@ -41,7 +41,7 @@ class LocalCommitError(PatchError):
 def get_tag(commit, repo):
     command = f'(cd {repo};git name-rev --refs=refs/tags/v* {commit})'
     tag = run_command(command)
-    if tag == '':
+    if not tag:
         return None
 
     m = re.search(r'tags/([a-zA-Z0-9\.-]+)\~?\S*$', tag)
@@ -52,10 +52,11 @@ def get_tag(commit, repo):
         return m.group(1)
     return None
 
+
 def get_next_tag(repo):
     command = f"(cd {repo} ; git tag -l 'v[0-9]*')"
     tag = run_command(command)
-    if tag == '':
+    if not tag:
         return None
 
     lines = tag.split()
@@ -65,16 +66,18 @@ def get_next_tag(repo):
     m = re.search(r'v([0-9]+)\.([0-9]+)(|-rc([0-9]+))$', lasttag)
     if m:
         # Post-release commit with no rc, it'll be rc1
-        if m.group(3) == '':
-            nexttag = f'v{m.group(1)}.{int(m.group(2))+1}-rc1'
+        if not m.group(3):
+            nexttag = f'v{m.group(1)}.{int(m.group(2)) + 1}-rc1'
         else:
-            nexttag = f'v{m.group(1)}.{int(m.group(2))} or v{m.group(1)}.{m.group(2)}-rc{int(m.group(4))+1} (next release)'
+            nexttag = f'v{m.group(1)}.{int(m.group(2))} or v{m.group(1)}.{m.group(2)}-rc{int(m.group(4)) + 1} (next release)'
         return nexttag
 
     return None
 
+
 def get_diffstat(message):
     return run_command('diffstat -p1', our_input=message)
+
 
 def get_git_repo_url(a_dir):
     command = f'(cd {a_dir}; git remote show origin -n)'
@@ -83,32 +86,33 @@ def get_git_repo_url(a_dir):
         m = re.search(r'URL:\s+(\S+)', line)
         if m:
             return m.group(1)
-
     return None
+
 
 def confirm_commit(commit, repo):
     command = f'cd {repo};git rev-list HEAD --not --remotes $(git config --get branch.$(git symbolic-ref --short HEAD).remote)'
     out = run_command(command)
-    if out == '':
+    if not out:
         return True
     commits = out.split()
     return commit not in commits
 
+
 def canonicalize_commit(commit, repo):
     return run_command(f'cd {repo} ; git show -s {commit}^{{}} --pretty=%H')
+
 
 def get_commit(commit, repo, force=False):
     command = f'cd {repo}; git diff-tree --no-renames --pretty=email -r -p --cc --stat {commit}'
     data = run_command(command)
-    if data == '':
+    if not data:
         return None
-
     if not force and not confirm_commit(commit, repo):
         raise LocalCommitError('Commit is not in the remote repository. Use -f to override.')
-
     return data
 
-def safe_filename(name, keep_non_patch_brackets = True):
+
+def safe_filename(name, keep_non_patch_brackets=True):
     if name is None:
         return name
 

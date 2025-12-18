@@ -10,11 +10,12 @@ import site
 
 from patchtools.command import run_command
 
-MAINLINE_URLS = [ """git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git""",
-                  """git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git""",
-                  """https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git""",
-                  """https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git""",
-                ]
+MAINLINE_URLS = [
+        """git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux-2.6.git""",
+        """git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git""",
+        """https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git""",
+        """https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git""",
+        ]
 
 
 def get_git_repo_url(gitdir):
@@ -27,15 +28,17 @@ def get_git_repo_url(gitdir):
 
     return None
 
+
 def get_git_config(gitdir, var):
     command = f'(cd {gitdir}; git config {var})'
     return run_command(command).strip()
+
 
 # We deliberately don't catch exceptions when the option is mandatory
 class Config:
     def __init__(self):
         # Set some sane defaults
-        self.repos = [ os.getcwd() ]
+        self.repos = [os.getcwd()]
         self.mainline_repos = MAINLINE_URLS
         self.merge_mainline_repos()
         self.email = get_git_config(os.getcwd(), 'user.email')
@@ -90,5 +93,8 @@ class Config:
 
     def get_default_mainline_repo(self):
         return self._canonicalize(self.mainline_repos[0])
+
+# set up a global config instance
+config = Config()
 
 # vim: sw=4 ts=4 et si:

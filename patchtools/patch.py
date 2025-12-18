@@ -5,27 +5,33 @@ Support package for doing SUSE Patch operations
 """
 
 import email.parser
-import os
 import os.path
 import re
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
-from patchtools import PatchError, config, patchops
+from patchtools.config import config
+from patchtools.patcherror import PatchError
+from patchtools import patchops
 
 _patch_start_re = re.compile(r'^(---|\*\*\*|Index:)[ \t][^ \t]|^diff -|^index [0-9a-f]{7}')
+
 
 class InvalidCommitIDError(PatchError):
     pass
 
+
 class InvalidPatchError(PatchError):
     pass
+
 
 class InvalidURLError(PatchError):
     pass
 
+
 class EmptyCommitError(PatchError):
     pass
+
 
 class Patch:
     def __init__(self, commit=None, repo=None, debug=False, force=False):
@@ -43,7 +49,7 @@ class Patch:
         if self.debug:
             print('DEBUG: repo_list:', self.repo_list)
 
-        if commit and (re.search(r'\^', commit) or re.search('HEAD', commit)):
+        if commit and (re.search(r'\^', commit) or 'HEAD' in commit):
             raise InvalidCommitIDError('Commit IDs must be hashes, not relative references. HEAD and ^ are not allowed.')
 
     def add_diffstat(self):
@@ -65,7 +71,7 @@ class Patch:
         header = self.header().rstrip() + '\n'
         self.message.set_payload(header + diffstat + self.body())
 
-    def strip_diffstat(self):
+    def update_diffstat(self):
         text = ''
         eat = ''
         for line in self.header().splitlines():
@@ -79,9 +85,6 @@ class Patch:
             eat = ''
 
         self.message.set_payload(text + '\n' + self.body())
-
-    def update_diffstat(self):
-        self.strip_diffstat()
         self.add_diffstat()
 
     def add_references(self, newrefs):
@@ -112,7 +115,7 @@ class Patch:
                 text = text.rstrip() + '\n'
 
                 # If this is the first *-by tag, separate it
-                if not re.search(r'-by: ', last):
+                if '-by: ' not in last:
                     text += '\n'
                 tag = 'Signed-off-by' if sob else 'Acked-by'
                 text += f'{tag}: {config.name} <{config.email}>\n'
@@ -149,7 +152,7 @@ class Patch:
         elif self.repo and not self.message['Git-repo']:
             r = self.repourl
             if not r:
-                    r = patchops.get_git_repo_url(self.repo)
+                r = patchops.get_git_repo_url(self.repo)
             if r and r not in self.mainline_repo_list:
                 self.message.add_header('Git-repo', r)
                 self.repourl = r
@@ -160,7 +163,7 @@ class Patch:
         if self.in_mainline:
             tag = patchops.get_tag(self.commit, self.repo)
             if tag and tag == 'undefined':
-                    tag = patchops.get_next_tag(self.repo)
+                tag = patchops.get_next_tag(self.repo)
             if tag:
                 if 'Patch-mainline' in self.message:
                     self.message.replace_header('Patch-mainline', tag)
@@ -177,7 +180,7 @@ class Patch:
         self.handle_merge()
 
     def from_file(self, pathname):
-        with Path(pathname).open('r') as f:
+        with Path(pathname).open('r', encoding='utf-8') as f:
             self.from_email(f.read())
 
     def files(self):
@@ -252,7 +255,7 @@ class Patch:
                 if commit:
                     r = self.repourl
                     if not r:
-                            r = patchops.get_git_repo_url(self.repo)
+                        r = patchops.get_git_repo_url(self.repo)
                     if r and r in self.mainline_repo_list:
                         self.in_mainline = True
                     else:
@@ -295,7 +298,6 @@ class Patch:
 
     @staticmethod
     def shrink_chunk(chunk):
-        n = -1
         text = ''
         start = -1
         end = -1
@@ -305,11 +307,10 @@ class Patch:
         count = 0
         lines = chunk.splitlines()
         debug = False
-        for line in lines:
-            n += 1
+        for n, line in enumerate(lines):
             if re.match(r'^-', line):
                 if start < 0:
-                    start = n - 3 # count this line
+                    start = n - 3   # count this line
                     if start < 0:
                         if debug:
                             print(f'resetting start(1) ({start}, {n})')
@@ -322,7 +323,7 @@ class Patch:
                 count = 0
             elif re.match(r'^\+', line):
                 if start < 0:
-                    start = n - 3 # count this line
+                    start = n - 3   # count this line
                     if start < 0:
                         if debug:
                             print(f'resetting start(2) ({start}, {n})')
@@ -335,8 +336,8 @@ class Patch:
                 count = 0
             else:
                 count += 1
-                if start >= 0 and end < 0 and (count > 3 or n +1 == len(lines)):   # noqa: PLR2004
-                    end = n # count this line
+                if start >= 0 and end < 0 and (count > 3 or n + 1 == len(lines)):   # noqa: PLR2004
+                    end = n  # count this line
                     if end >= len(lines):
                         if debug:
                             print('Truncating end')
@@ -347,7 +348,7 @@ class Patch:
 
             if start >= 0 and end >= 0:
                 diff = end - start
-                text +=  f'@@ -{start+1},{diff-added} +{start+1},{diff-removed} @@\n'
+                text += f'@@ -{start+1},{diff-added} +{start+1},{diff-removed} @@\n'    # noqa: E226
                 text += '\n'.join(lines[start:end])
                 text += '\n'
                 end = -1
@@ -417,7 +418,7 @@ class Patch:
 
         self.message.set_payload(self.header() + body)
 
-        if body == '':
+        if not body:
             is_empty = True
 
         if partial:

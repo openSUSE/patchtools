@@ -13,16 +13,16 @@ import sys
 from optparse import OptionParser
 from pathlib import Path
 
-from patchtools import PatchError
-from patchtools import __version__ as patchtools_version
+from patchtools.patcherror import PatchError
+from patchtools.version import __version__
 from patchtools.patch import Patch
 
 
-def process_file(pathname, options):
+def fix_patchfile(pathname, options):
     """Try to fix a patch file -- errors are ignored"""
     try:
         p = Patch()
-        with Path(pathname).open('r') as f:
+        with Path(pathname).open('r', encoding='utf-8') as f:
             p.from_email(f.read())
 
         if options.name_only:
@@ -68,13 +68,13 @@ def process_file(pathname, options):
         else:
             fn = f'{p.get_pathname()}{suffix}'
             dirname = os.path.dirname(pathname)
-            if dirname != '':
+            if dirname:
                 fn = f'{dirname}/{fn}'
             if fn != pathname and os.path.exists(fn) and not options.force:
                 print(f'{fn} already exists.', file=sys.stderr)
                 return
         print(fn)
-        with Path(fn).open('w') as f:
+        with Path(fn).open('w', encoding='utf-8') as f:
             print(p.message.as_string(unixfrom=False), file=f)
         if fn != pathname:
             os.unlink(pathname)
@@ -83,9 +83,10 @@ def process_file(pathname, options):
 
     return
 
+
 def main():
     """Fix one or more patch files"""
-    parser = OptionParser(version='%prog ' + patchtools_version)
+    parser = OptionParser(version='%prog ' + __version__)
     parser.add_option('-n', '--dry-run', action='store_true', default=False,
                       help='Output results to stdout but do not commit change')
     parser.add_option('-N', '--no-ack', action='store_true', default=False,
@@ -119,7 +120,7 @@ def main():
         return 1
 
     for pathname in args:
-        process_file(pathname, options)
+        fix_patchfile(pathname, options)
 
     return 0
 

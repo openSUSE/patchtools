@@ -11,12 +11,13 @@ import sys
 from optparse import OptionParser
 from pathlib import Path
 
-from patchtools import PatchError
-from patchtools import __version__ as patchtools_version
+from patchtools.patcherror import PatchError
+from patchtools.version import __version__
 from patchtools.patch import EmptyCommitError, Patch
 
 WRITE_PATCHFILE_DEFAULT = False
 WRITE_PATCHFILE_DIR_DEFAULT = '.'
+
 
 def export_patch(commit, options, prefix, suffix):
     try:
@@ -48,7 +49,7 @@ def export_patch(commit, options, prefix, suffix):
                 print(f'{f} already exists. Using {fn}', file=sys.stderr)
             print(os.path.basename(fn))
             try:
-                with Path(fn).open('w') as f:
+                with Path(fn).open('w', encoding='utf-8') as f:
                     print(p.message.as_string(False), file=f)
             except Exception as e:
                 print(f'Failed to write {fn}: {e}', file=sys.stderr)
@@ -60,9 +61,10 @@ def export_patch(commit, options, prefix, suffix):
     print(f'Could not locate commit "{commit}"; Skipping.', file=sys.stderr)
     return 1
 
+
 def main():
     """Export one or more patches from git, by commit hash"""
-    parser = OptionParser(version='%prog ' + patchtools_version,
+    parser = OptionParser(version='%prog ' + __version__,
                           usage='%prog [options] <LIST OF COMMIT HASHES> --  export patch with proper patch headers')
     parser.add_option('-w', '--write', action='store_true',
                       help='write patch file(s) instead of stdout [default is %default]',
@@ -111,7 +113,7 @@ def main():
         print('option -N needs a number')
         return 1
 
-    max_val=9999
+    max_val = 9999  # set a reasonable limit
     if n + len(args) > max_val or n < 0:
         print(f'The starting number + commits needs to be in the range 0 - {max_val}')
         return 1
@@ -121,9 +123,9 @@ def main():
     num_width = 4
     max_width = 5
     if options.num_width:
-        _n = int(options.num_width)
-        if _n > 0 and _n < max_width:
-            num_width = _n
+        n_ = int(options.num_width)
+        if n_ > 0 and n_ < max_width:
+            num_width = n_
 
     for commit in args:
         prefix = '{0:0{1}}-'.format(n, num_width) if options.numeric else ''

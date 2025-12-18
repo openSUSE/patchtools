@@ -4,22 +4,12 @@ The 'patch' class
 Used to represent all patches
 """
 
-from . import config
-
-__version__ = '2.6'
-
-class PatchError(Exception):
-    pass
-
-config = config.Config()
+from .exportpatch import export_patch
+from .fixpatch import fix_patchfile
 
 __all__ = [
-        'command',
-        'config',
-        'exportpatch',
-        'fixpatch',
-        'patch',
-        'patchops',
+        'export_patch',
+        'fix_patchfile',
         ]
 
 # vim: sw=4 ts=4 et si:

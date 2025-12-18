@@ -31,7 +31,7 @@ exportpatch = "patchtools.exportpatch:main"
 fixpatch = "patchtools.fixpatch:main"
 
 [tool.setuptools.dynamic]
-version = {attr = "patchtools.__version__"}
+version = {attr = "patchtools.version.__version__"}
 
 [tool.ruff]
 line-length = 120
