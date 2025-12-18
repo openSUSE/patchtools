@@ -11,9 +11,9 @@ import sys
 from optparse import OptionParser
 from pathlib import Path
 
+from patchtools.patch import EmptyCommitError, Patch
 from patchtools.patcherror import PatchError
 from patchtools.version import __version__
-from patchtools.patch import EmptyCommitError, Patch
 
 WRITE_PATCHFILE_DEFAULT = False
 WRITE_PATCHFILE_DIR_DEFAULT = '.'

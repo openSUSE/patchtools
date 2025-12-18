@@ -94,6 +94,7 @@ class Config:
     def get_default_mainline_repo(self):
         return self._canonicalize(self.mainline_repos[0])
 
+
 # set up a global config instance
 config = Config()
 

@@ -6,8 +6,8 @@ Support package for doing SUSE Patch operations
 
 import re
 
-from patchtools.patcherror import PatchError
 from patchtools.command import run_command
+from patchtools.patcherror import PatchError
 
 
 def key_version(tag):

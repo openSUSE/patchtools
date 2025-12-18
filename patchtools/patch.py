@@ -10,9 +10,9 @@ import re
 from pathlib import Path
 from urllib.parse import unquote, urlparse
 
+from patchtools import patchops
 from patchtools.config import config
 from patchtools.patcherror import PatchError
-from patchtools import patchops
 
 _patch_start_re = re.compile(r'^(---|\*\*\*|Index:)[ \t][^ \t]|^diff -|^index [0-9a-f]{7}')
 

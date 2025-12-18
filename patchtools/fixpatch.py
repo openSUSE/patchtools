@@ -13,9 +13,9 @@ import sys
 from optparse import OptionParser
 from pathlib import Path
 
+from patchtools.patch import Patch
 from patchtools.patcherror import PatchError
 from patchtools.version import __version__
-from patchtools.patch import Patch
 
 
 def fix_patchfile(pathname, options):
