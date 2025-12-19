@@ -1,5 +1,4 @@
-"""
-Setup file for installation
+"""Setup file for installation.
 
 Not used for Python version >= 3.11
 
@@ -77,6 +76,6 @@ setup(
     name='patchtools',
     packages=['patchtools'],
     scripts=[f'scripts/{p}' for p in SCRIPT_MODULES],
-    version='2.5')
+    version='2.6')
 
 # vim: sw=4 ts=4 et si:

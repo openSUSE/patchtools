@@ -348,7 +348,7 @@ class Patch:
 
             if start >= 0 and end >= 0:
                 diff = end - start
-                text += f'@@ -{start+1},{diff-added} +{start+1},{diff-removed} @@\n'    # noqa: E226
+                text += f'@@ -{start+1},{diff-added} +{start+1},{diff-removed} @@\n'   # noqa: E226
                 text += '\n'.join(lines[start:end])
                 text += '\n'
                 end = -1
