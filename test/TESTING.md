@@ -19,16 +19,33 @@
 
 #### normal ops
 
-* export a "known patch" (to stdout?), make sure it matches the known output? (what about 'signed-off-by')
+* export a simple commit, just one file, just one hunk:
+
+** export a known patch to a dir/file, with and without a suffix
+
+** export a known patch to a dir/file, with and without a suffix
+   numeric, with normal and set starting number, with and
+   without max width
+
+** export a simple patch to current dir
+
+** export a simple patch to dir/file, but one already exists
+
+** export a simple patch to dir/file, overwriting one that exists
+
+** export a simple patch to dir/file, testing reference
+
+** export a known patch to stdout
+
+
 * export a tag (not a commit)
-* write a patch -- default, no number, and no suffix, in current dir
-* write to a good dir and to current dir
-* write with and without suffix
-* write with and without numbering
-* write with non-default starting number
-* can write over a patch if and only if --force is supplied
-* write with and without reference
-* make sure extract and exclude work
-* ensure signed-off-by works
+
+
+* export a commit that has multiple files
+
+** ensure extract works
+
+** ensure exclude works
+
 * test various commits to ensure "Patch-mainline" is correct
 * test "num-width"?

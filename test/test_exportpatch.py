@@ -18,15 +18,12 @@ def my_run_command(command, stdin=None, our_input=None, stdout=PIPE, cwd=None):
 
 def get_patch_path(fname, dirname=None, prefix='', suffix='', truncate=64):
     """Return a patch filename that isn't too long"""
-    print(f'\nDEBUG: input fname={fname}, dirname={dirname}, suffix={suffix} ...')
     truncate_chars = truncate - len(fname) - len(prefix + suffix)
     if truncate_chars < 0:
-        print(f'DEBUG: truncating string by {truncate_chars} characters')
         fname = fname[0:truncate_chars]
     fpath = Path(prefix + fname + suffix)
     if dirname:
         fpath = Path(dirname) / fpath
-    print(f'DEBUG: returning fpath={fpath}')
     return fpath
 
 
