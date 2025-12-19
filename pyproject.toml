@@ -35,6 +35,10 @@ version = {attr = "patchtools.version.__version__"}
 
 [tool.ruff]
 line-length = 120
+exclude = [
+    "*venv",
+    "build",
+    ]
 
 [tool.ruff.lint]
 select = [
@@ -98,3 +102,7 @@ ignore = [
 [tool.ruff.lint.flake8-quotes]
 # Double quotes are currently prevalent in the codebase. Not being checked.
 inline-quotes = "single"
+
+[tools.ruff.format]
+quote-style = "single"
+indent-style = "space"
