@@ -17,35 +17,50 @@
 * specify out-of-range starting number for a numbered patch
 * trying to write a patch file when one already exists without --force (should get funky name)
 
+* test with various (or missing) config file for what RFEPOs to search
+
+
 #### normal ops
 
 * export a simple commit, just one file, just one hunk:
 
-** export a known patch to a dir/file, with and without a suffix
+** export to a dir/file, using defaults                     -- done (2 cases)
+   repeat with a suffix
 
-** export a known patch to a dir/file, with and without a suffix
-   numeric, with normal and set starting number, with and
-   without max width
+** export to a dir/file, using numeric values,              -- done (3 cases)
+   repeat with non-default starting number
+   repeat with non-default width
 
-** export a simple patch to current dir
+** export to a dir/file, using 'force' to overwrite         -- done (2 cases)
+   repeat without force set
 
-** export a simple patch to dir/file, but one already exists
+** export to stdout                                         -- done (1 case)
 
-** export a simple patch to dir/file, overwriting one that exists
+** export to current dir                                    -- done (1 case)
 
-** export a simple patch to dir/file, testing reference
+** export to dir/file, testing reference                    -- done (1 case)
 
-** export a known patch to stdout
+** export to stdout, but exclude whoe file
+
+** export to sdout, using extract of whole file
+
 
 
 * export a tag (not a commit)
 
 
 * export a commit that has multiple files
-
 ** ensure extract works
-
 ** ensure exclude works
 
 * test various commits to ensure "Patch-mainline" is correct
-* test "num-width"?
+
+### error ops
+
+* test "num-width" limits
+
+* test bogus params, such as
+** bogus commit
+** no commit
+** bad arguments
+** illegal values for num-width?
