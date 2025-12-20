@@ -1,6 +1,6 @@
 # Testing for patchtools, using pyunit
 
-## to test
+## Things to test
 
 ### exportpatch
 
@@ -64,3 +64,16 @@
 ** no commit
 ** bad arguments
 ** illegal values for num-width?
+
+## How to Test
+
+To run these tests, using the python unittest module. For
+example, from the source directory:
+
+    zsh> python3.11 -m unittest -v test
+
+This will run all the tests in the "test" class, which
+are int he "test" subdirectory. To run a single test, you
+could use:
+
+    zsh> test.test_exportpatch.TestExportpatchNormalFunctionality.test_to_stdout_defaults

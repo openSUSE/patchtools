@@ -1,6 +1,6 @@
 """The 'test' class for patchtools."""
 
-from .test_exportpatch  import TestExportpatchNormalFunctionality
+from .test_exportpatch import TestExportpatchNormalFunctionality
 
 __all__ = [
         'TestExportpatchNormalFunctionality',

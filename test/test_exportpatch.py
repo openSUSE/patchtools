@@ -1,11 +1,10 @@
-#!/usr/bin/python3.11
 """The test suite for the patchtools exportpatch command.
 
 Test using the locally available 'exportpatch' command, and its
 libraries. Assume the local config files are correct."""
 
-import os
 import filecmp
+import os
 import tempfile
 import unittest
 from pathlib import Path
@@ -30,11 +29,13 @@ def get_patch_path(fname, dirname=None, prefix='', suffix='', truncate=64):
         fpath = Path(dirname) / fpath
     return fpath
 
+
 def debug_dump_file(fname):
     print(f'DEBUG: dumping file: {fname} ...')
     with Path(fname).open(encoding='utf-8') as f:
         for aline in f:
             print(aline.rstrip())
+
 
 # the command we are here to test
 test_cmd = 'exportpatch'
@@ -178,7 +179,7 @@ class TestExportpatchNormalFunctionality(unittest.TestCase):
         # ensure command succeeded
         self.assertEqual(res, 0, f'running {test_cmd} failed')
         # create a temp file
-        tmpfd, tmpname = tempfile.mkstemp(text=True) 
+        tmpfd, tmpname = tempfile.mkstemp(text=True)
         # write out our patch to our temp file
         try:
             with os.fdopen(tmpfd, 'w', encoding='utf-8') as tmpf:
@@ -222,7 +223,3 @@ class TestExportpatchNormalFunctionality(unittest.TestCase):
             # compare the commit file with a known good one
             res = filecmp.cmp(ofile_path, f'test/data/{known_st_patch}.some_reference')
             self.assertEqual(res, True, 'patch file differs from known good')
-
-
-if __name__ == '__main__':
-    unittest.main()
