@@ -76,6 +76,6 @@ setup(
     name='patchtools',
     packages=['patchtools'],
     scripts=[f'scripts/{p}' for p in SCRIPT_MODULES],
-    version='2.6')
+    version='2.6.1')
 
 # vim: sw=4 ts=4 et si:
