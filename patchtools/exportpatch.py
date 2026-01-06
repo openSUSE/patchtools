@@ -53,8 +53,8 @@ def export_patch(commit, options, prefix, suffix):
             try:
                 f = open(fn, "w")
             except Exception as e:
-                print("Failed to write %s: %s" % (fn, e), file=sys.stderr)
-                raise e
+                print(e, file=sys.stderr)
+                return 1
 
             print(p.message.as_string(False), file=f)
             f.close()
@@ -66,10 +66,29 @@ def export_patch(commit, options, prefix, suffix):
     return 1
 
 
+#
+# set up Option Parsing class so that we can
+# stop the option parser from calling sys.exit()
+# when it encounters an error
+#
+
+class OptionParsingError(RuntimeError):
+    """An exception raised when parser.error() is called."""
+    def __init__(self, msg):
+        self.msg = msg
+
+
+class ModifiedOptionParser(OptionParser):
+    """Our own Option Parsing class, that does not call sys.exit()."""
+    def error(self, msg):
+        raise OptionParsingError(msg)
+
+
 def main():
     """The main entry point for this module. Return 0 for success."""
-    parser = OptionParser(version='%prog ' + __revision__,
-                          usage='%prog [options] <LIST OF COMMIT HASHES> --  export patch with proper patch headers')
+    parser = ModifiedOptionParser(\
+            version='%prog ' + __revision__,
+            usage='%prog [options] <LIST OF COMMIT HASHES> --  export patch with proper patch headers')
     parser.add_option("-w", "--write", action="store_true",
                       help="write patch file(s) instead of stdout [default is %default]",
                       default=WRITE)
@@ -82,7 +101,7 @@ def main():
     parser.add_option("--num-width", type="int", action="store",
                       help="when used with -n, set the width of the order numbers",
                       default=4)
-    parser.add_option("-N", "--first-number", action="store",
+    parser.add_option("-N", "--first-number", type="int", action="store",
                       help="Start numbering the patches with number instead of 1",
                       default=1)
     parser.add_option("-d", "--dir", action="store",
@@ -100,21 +119,23 @@ def main():
     parser.add_option("-S", "--signed-off-by", action="store_true",
                       default=False,
                       help="Use Signed-off-by instead of Acked-by")
-    (options, args) = parser.parse_args()
-
-    if not args:
-        parser.error("Must supply patch hash(es)")
-        return 1
 
     try:
-        n = int(options.first_number)
-    except ValueError: 
-        print("option -N needs a number")
+        (options, args) = parser.parse_args()
+
+    except OptionParsingError as e:
+        print(f'Option paring error: {e.msg}', file=sys.stderr)
         return 1
 
-    if n + len(args) > 9999 or n < 0:
-        print("The starting number + commits needs to be in the range 0 - 9999")
+    if not args:
+        print('Must supply patch hash(es)', file=sys.stderr)
         return 1
+
+    if options.first_number + len(args) > 9999 or options.first_number < 0:
+        print("The starting number + commits needs to be in the range 0 - 9999",
+              file=sys.stderr)
+        return 1
+
     suffix = ""
     if options.suffix:
         suffix = ".patch"
@@ -125,15 +146,16 @@ def main():
         if _n > 0 and _n < 5:
             num_width = _n
 
+    n = options.first_number
     for commit in args:
         prefix = ""
-
         if options.numeric:
             prefix = "{0:0{1}}-".format(n, num_width)
 
         res = export_patch(commit, options, prefix, suffix)
         if res:
             return res
+
         n += 1
 
     return 0

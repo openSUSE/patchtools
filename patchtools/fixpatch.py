@@ -29,7 +29,7 @@ def process_file(pathname, options):
                 suffix = ".patch"
             fn = p.get_pathname()
             print("{}{}".format(fn, suffix))
-            return
+            return 0
 
         if options.update_only:
             options.header_only = True
@@ -55,7 +55,7 @@ def process_file(pathname, options):
 
         if options.dry_run:
             print(p.message.as_string(unixfrom=False))
-            return
+            return 0
 
         suffix=""
         if options.suffix:
@@ -70,19 +70,50 @@ def process_file(pathname, options):
                 fn = "{}/{}".format(dirname, fn)
             if fn != pathname and os.path.exists(fn) and not options.force:
                 print("%s already exists." % fn, file=sys.stderr)
-                return
-        print(fn)
+                return 1
         f = open(fn, "w")
+        print(fn)
         print(p.message.as_string(unixfrom=False), file=f)
         f.close()
         if fn != pathname:
             os.unlink(pathname)
+
+    except FileNotFoundError as e:
+        print(e, file=sys.stderr)
+        return 1
+
+    except PermissionError as e:
+        print(e, file=sys.stderr)
+        return 1
+
     except PatchException as e:
         print(e, file=sys.stderr)
+        return 1
+
+    return 0
+
+#
+# set up Option Parsing class so that we can
+# stop the option parser from calling sys.exit()
+# when it encounters an error
+#
+
+class OptionParsingError(RuntimeError):
+    """An exception raised when parser.error() is called."""
+    def __init__(self, msg):
+        self.msg = msg
+
+class ModifiedOptionParser(OptionParser):
+    """Our own Option Parsing class, that does not call sys.exit()."""
+    def error(self, msg):
+        raise OptionParsingError(msg)
+
 
 def main():
     """The main entry point for this module. Return 0 for success."""
-    parser = OptionParser(version='%prog ' + __revision__)
+    parser = ModifiedOptionParser(\
+            version='%prog ' + __revision__,
+            usage='%prog [options] <LIST OF PATCH FILES TO FIX> -- fix patch files with proper headers')
     parser.add_option("-n", "--dry-run", action="store_true", default=False,
                       help="Output results to stdout but don't commit change")
     parser.add_option("-N", "--no-ack", action="store_true", default=False,
@@ -94,30 +125,36 @@ def main():
     parser.add_option("-f", "--force", action="store_true", default=False,
                       help="Overwrite patch if it exists already")
     parser.add_option("-H", "--header-only", action="store_true", default=False,
-                      help="Only update the patch headers, don't do Acked-by or Diffstat")
+                      help="Only update patch headers, don't do Acked-by, diffstat, or add references")
     parser.add_option("-U", "--update-only", action="store_true", default=False,
                       help="Update the patch headers but don't rename (-Hr)")
     parser.add_option("-R", "--name-only", action="store_true", default=False,
                       help="Print the new filename for the patch but don't change anything")
     parser.add_option("-F", "--reference", action="append", default=None,
-                      help="add reference tag")
-    parser.add_option("-S", "--signed-off-by", action="store_true",
-              default=False,
-              help="Use Signed-off-by instead of Acked-by")
+                      help="add reference tag, if not in header-only mode. Can be supplied multiple times.")
+    parser.add_option("-S", "--signed-off-by", action="store_true", default=False,
+                      help="Use Signed-off-by instead of Acked-by")
     parser.add_option("-M", "--mainline", action="append", default=None,
-                      help="Add dummy Patch-mainline tag")
+                      help="Add dummy Patch-mainline tag. Can be supplied multiple times.")
     parser.add_option("-s", "--suffix", action="store_true",
-                      help="when used with -w, append .patch suffix to filenames.",
+                      help='When generating the patch name, append ".patch"',
                       default=False)
 
-    (options, args) = parser.parse_args()
+    try:
+        (options, args) = parser.parse_args()
+
+    except OptionParsingError as e:
+        print(f'Option paring error: {e.msg}', file=sys.stderr)
+        return 1
 
     if not args:
-        parser.error("Must supply patch filename(s)")
+        print("Must supply patch filename(s)", file=sys.stderr)
         return 1
 
     for pathname in args:
-        process_file(pathname, options)
+        res = process_file(pathname, options)
+        if res:
+            return 1
 
     return 0
 
