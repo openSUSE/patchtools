@@ -82,7 +82,7 @@ def main():
     parser.add_option("--num-width", type="int", action="store",
                       help="when used with -n, set the width of the order numbers",
                       default=4)
-    parser.add_option("-N", "--first-number", action="store",
+    parser.add_option("-N", "--first-number", type="int", action="store",
                       help="Start numbering the patches with number instead of 1",
                       default=1)
     parser.add_option("-d", "--dir", action="store",
@@ -106,15 +106,11 @@ def main():
         parser.error("Must supply patch hash(es)")
         return 1
 
-    try:
-        n = int(options.first_number)
-    except ValueError: 
-        print("option -N needs a number")
+    if options.first_number + len(args) > 9999 or options.first_number < 0:
+        print("The starting number + commits needs to be in the range 0 - 9999",
+              file=sys.stderr)
         return 1
 
-    if n + len(args) > 9999 or n < 0:
-        print("The starting number + commits needs to be in the range 0 - 9999")
-        return 1
     suffix = ""
     if options.suffix:
         suffix = ".patch"
@@ -125,15 +121,16 @@ def main():
         if _n > 0 and _n < 5:
             num_width = _n
 
+    n = options.first_number
     for commit in args:
         prefix = ""
-
         if options.numeric:
             prefix = "{0:0{1}}-".format(n, num_width)
 
         res = export_patch(commit, options, prefix, suffix)
         if res:
             return res
+
         n += 1
 
     return 0
