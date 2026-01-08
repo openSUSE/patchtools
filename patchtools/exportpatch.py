@@ -53,8 +53,8 @@ def export_patch(commit, options, prefix, suffix):
             try:
                 f = open(fn, "w")
             except Exception as e:
-                print("Failed to write %s: %s" % (fn, e), file=sys.stderr)
-                raise e
+                print(e, file=sys.stderr)
+                return 1
 
             print(p.message.as_string(False), file=f)
             f.close()
