@@ -1,0 +1,64 @@
+# Exclude a directory from linting
+exclude = ["data"]
+
+# Set the maximum line length
+line-length = 120
+
+[lint]
+select = [
+    "F",    # Pyflakes
+    "E",    # pycodestyle error
+    "W",    # pycodestyle warning
+    "I",    # isort
+    "N",    # pep8-naming
+    "UP",   # pyupgrade
+    "YTT",  # flake8-2020
+    "S",    # flake8-bandit
+    "B",    # flake8-bugbear
+    "A",    # flake8-builtins
+    "COM",  # flake8-commas
+    "C4",   # flake8-comprehensions
+    "EXE",  # flake8-executable
+    "FA",   # flake8-future-annotations
+    "ISC",  # flake8-implicit-str-concat
+    "ICN",  # flake8-import-conventions
+    "PIE",  # flake8-pie
+    "Q000", # use the proper quotes
+    "Q003", # flake8-quotes avoidable-escaped-quote
+    "Q004", # flake8-quotes unnecessary-escaped-quote
+    "RSE",  # flake8-raise
+    "RET",  # flake8-return
+    "SIM",  # flake8-simplify
+    "TID",  # flake8-tidy-imports
+    "INT",  # flake8-gettext
+    "ARG",  # flake8-unused-argument
+    #"PTH", # flake8-use-pathlib TODO
+    "PL",   # Pylint
+    "FLY",  # flynt
+    "PERF", # Perflint
+    "FURB", # refurb
+    "RUF",  # Ruff
+    "PTH123", # prefer Path.open() over builtin open()
+    "D209", # docstrings check
+    # ignore these?
+    "I001", # Unsorted imports
+    "E722",  # do not use bare 'except'
+    "S104",  # Possible binding to all interfaces (0.0.0.0)
+    "B904",  # raise-without-from-inside-except
+    "ARG002", "PLR6301",  # Unused self, parameter in methods definitions
+    "PLR09",  # Too many branches/statements/arguments
+    "PLW1514", # `open` in text mode without explicit `encoding` argument
+]
+
+
+[lint.isort]
+# Configure isort-specific settings, like treating specific modules as first-party
+# first-party-alpine = ["my_application"]
+
+
+[lint.flake8-quotes]
+inline-quotes = "single"
+
+[format]
+quote-style = "single"
+indent-style = "space"

@@ -130,7 +130,11 @@ class Patch:
         self.message.set_payload(text)
 
     def add_mainline(self, tag):
-        self.message.add_header('Patch-mainline', ' '.join(tag))
+        """Add or create a 'Patch-mainline' header, with 'tag'."""
+        if 'Patch-mainline' in self.message:
+            self.message.replace_header('Patch-mainline', ' '.join(tag))
+        else:
+            self.message.add_header('Patch-mainline', ' '.join(tag))
 
     def from_email(self, msg):
         p = email.parser.Parser()
