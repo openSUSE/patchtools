@@ -112,7 +112,7 @@ def main():
     parser.add_option("-S", "--signed-off-by", action="store_true", default=False,
                       help="Use Signed-off-by instead of Acked-by")
     parser.add_option("-M", "--mainline", action="append", default=None,
-                      help="Add dummy Patch-mainline tag. Can be supplied multiple times.")
+                      help="Add Patch-mainline tag. Replaces existing tag if any. Can be supplied multiple times.")
     parser.add_option("-s", "--suffix", action="store_true",
                       help='When generating the patch name, append ".patch"',
                       default=False)
