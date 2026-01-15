@@ -117,9 +117,9 @@ def safe_filename(name, keep_non_patch_brackets = True):
     # to remove noise from the subject line.
     # keep_non_patch_brackets=True is the equivalent of git am -b
     if keep_non_patch_brackets:
-        name = re.sub(r'(([Rr][Ee]:|\[PATCH[^]]*\])[ \t]*)*', '', name, 1)
+        name = re.sub(r'(([Rr][Ee]:|\[PATCH[^]]*\])[ \t]*)*', '', name, count=1)
     else:
-        name = re.sub(r'(([Rr][Ee]:|\[[^]]*\])[ \t]*)*', '', name, 1)
+        name = re.sub(r'(([Rr][Ee]:|\[[^]]*\])[ \t]*)*', '', name, count=1)
 
     # This mimics the filters that git-format-patch applies prior to adding
     # prefixes or suffixes.
