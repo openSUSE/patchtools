@@ -1,0 +1,110 @@
+From: Chaohai Chen <wdhh6@aliyun.com>
+Date: Sat, 6 Dec 2025 14:06:16 +0800
+Subject: scsi: libsas: Add rollback handling when an error occurs
+Git-commit: 362432e9b9aefb914ab7d9f86c9fc384a6620c41
+Patch-mainline: v6.19-rc1
+
+In sas_register_phys(), if an error is triggered in the loop process, we
+need to roll back the resources that have already been requested.
+
+Add sas_unregister_phys() when an error occurs in sas_register_ha().
+
+[mkp: a few coding style tweaks and address John's comment]
+
+Signed-off-by: Chaohai Chen <wdhh6@aliyun.com>
+Reviewed-by: John Garry <john.g.garry@oracle.com>
+Link: https://patch.msgid.link/20251206060616.69216-1-wdhh6@aliyun.com
+Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+Acked-by: Barney Rubbel <brubbel@suse.com>
+---
+ drivers/scsi/libsas/sas_init.c     |  1 +
+ drivers/scsi/libsas/sas_internal.h |  1 +
+ drivers/scsi/libsas/sas_phy.c      | 33 ++++++++++++++++++++++++++++++---
+ 3 files changed, 32 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/scsi/libsas/sas_init.c b/drivers/scsi/libsas/sas_init.c
+index 8566bb1208a0..6b15ad1bcada 100644
+--- a/drivers/scsi/libsas/sas_init.c
++++ b/drivers/scsi/libsas/sas_init.c
+@@ -141,6 +141,7 @@ int sas_register_ha(struct sas_ha_struct *sas_ha)
+ Undo_ports:
+ 	sas_unregister_ports(sas_ha);
+ Undo_phys:
++	sas_unregister_phys(sas_ha);
+ 
+ 	return error;
+ }
+diff --git a/drivers/scsi/libsas/sas_internal.h b/drivers/scsi/libsas/sas_internal.h
+index da5408c701cd..d104c87f04f5 100644
+--- a/drivers/scsi/libsas/sas_internal.h
++++ b/drivers/scsi/libsas/sas_internal.h
+@@ -54,6 +54,7 @@ void sas_unregister_dev(struct asd_sas_port *port, struct domain_device *dev);
+ void sas_scsi_recover_host(struct Scsi_Host *shost);
+ 
+ int  sas_register_phys(struct sas_ha_struct *sas_ha);
++void sas_unregister_phys(struct sas_ha_struct *sas_ha);
+ 
+ struct asd_sas_event *sas_alloc_event(struct asd_sas_phy *phy, gfp_t gfp_flags);
+ void sas_free_event(struct asd_sas_event *event);
+diff --git a/drivers/scsi/libsas/sas_phy.c b/drivers/scsi/libsas/sas_phy.c
+index 635835c28ecd..58f08dc2c187 100644
+--- a/drivers/scsi/libsas/sas_phy.c
++++ b/drivers/scsi/libsas/sas_phy.c
+@@ -116,6 +116,7 @@ static void sas_phye_shutdown(struct work_struct *work)
+ int sas_register_phys(struct sas_ha_struct *sas_ha)
+ {
+ 	int i;
++	int err;
+ 
+ 	/* Now register the phys. */
+ 	for (i = 0; i < sas_ha->num_phys; i++) {
+@@ -132,8 +133,10 @@ int sas_register_phys(struct sas_ha_struct *sas_ha)
+ 		phy->frame_rcvd_size = 0;
+ 
+ 		phy->phy = sas_phy_alloc(&sas_ha->shost->shost_gendev, i);
+-		if (!phy->phy)
+-			return -ENOMEM;
++		if (!phy->phy) {
++			err = -ENOMEM;
++			goto rollback;
++		}
+ 
+ 		phy->phy->identify.initiator_port_protocols =
+ 			phy->iproto;
+@@ -146,10 +149,34 @@ int sas_register_phys(struct sas_ha_struct *sas_ha)
+ 		phy->phy->maximum_linkrate = SAS_LINK_RATE_UNKNOWN;
+ 		phy->phy->negotiated_linkrate = SAS_LINK_RATE_UNKNOWN;
+ 
+-		sas_phy_add(phy->phy);
++		err = sas_phy_add(phy->phy);
++		if (err) {
++			sas_phy_free(phy->phy);
++			goto rollback;
++		}
+ 	}
+ 
+ 	return 0;
++rollback:
++	for (i-- ; i >= 0 ; i--) {
++		struct asd_sas_phy *phy = sas_ha->sas_phy[i];
++
++		sas_phy_delete(phy->phy);
++		sas_phy_free(phy->phy);
++	}
++	return err;
++}
++
++void sas_unregister_phys(struct sas_ha_struct *sas_ha)
++{
++	int i;
++
++	for (i = 0 ; i < sas_ha->num_phys ; i++) {
++		struct asd_sas_phy *phy = sas_ha->sas_phy[i];
++
++		sas_phy_delete(phy->phy);
++		sas_phy_free(phy->phy);
++	}
+ }
+ 
+ const work_func_t sas_phy_event_fns[PHY_NUM_EVENTS] = {
+
