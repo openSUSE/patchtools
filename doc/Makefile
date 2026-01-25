@@ -13,7 +13,7 @@ mandir ?= $(prefix)/share/man
 man1dir = $(mandir)/man1
 man5dir = $(mandir)/man5
 
-PATCHTOOLS_VERSION = $(shell python ../setup.py --version 2> /dev/null)
+PATCHTOOLS_VERSION = $(shell python3 ../setup.py --version 2> /dev/null)
 
 GZ_MAN1 = $(patsubst %.asciidoc,%.1.gz,$(MAN1_TXT))
 GZ_MAN5 = $(patsubst %.asciidoc,%.5.gz,$(MAN5_TXT))
