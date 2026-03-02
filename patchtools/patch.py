@@ -8,7 +8,7 @@ from patchtools import config, PatchException
 import re
 import os
 import os.path
-import email.parser
+import email.parser, email.policy
 import urllib.request, urllib.parse, urllib.error
 from urllib.parse import urlparse
 import string
@@ -137,7 +137,8 @@ class Patch:
             self.message.add_header('Patch-mainline', ' '.join(tag))
 
     def from_email(self, msg):
-        p = email.parser.Parser()
+        pol = email.policy.default.clone(utf8=True)
+        p = email.parser.Parser(policy=pol)
         self.message = p.parsestr(msg)
 
         if 'Git-commit' in self.message:
