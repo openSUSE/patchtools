@@ -35,7 +35,7 @@ class LocalCommitException(PatchException):
     pass
 
 def get_tag(commit, repo):
-    command = f"(cd {repo};git name-rev --refs=refs/tags/v* {commit})"
+    command = f"(cd {repo};git name-rev --refs=refs/tags/v[0-9]* {commit})"
     tag = run_command(command)
     if tag == "":
         return None
