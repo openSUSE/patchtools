@@ -28,7 +28,7 @@ class EmptyCommitException(PatchException):
     pass
 
 class Patch:
-    def __init__(self, commit=None, repo=None, debug=False, force=False):
+    def __init__(self, commit=None, repo=None, debug=False, force=False, stable=True):
         self.commit = commit
         self.repo = repo
         self.debug = debug
@@ -38,6 +38,7 @@ class Patch:
         self.repo_list = config.get_repos()
         self.mainline_repo_list = config.get_mainline_repos()
         self.in_mainline = False
+        self.stable = stable
         if repo in self.mainline_repo_list:
             self.in_mainline = True
         if self.debug:
@@ -474,6 +475,26 @@ class Patch:
 
         if is_empty:
             raise EmptyCommitException("commit is empty")
+
+    def stable_to_upstream(self):
+        if not self.stable:
+          return
+        text = self.message.get_payload().splitlines()
+        first_line = text[0]
+        if not "upstream" in first_line.casefold():
+          return
+        commit = ""
+        for word in first_line.split(' '):
+          if len(word) == 40 and all(c in string.hexdigits for c in word):
+              commit = word
+              break
+        if commit:
+          if self.debug:
+            print("Transforming stable commit to mainline ", word)
+          self.message.replace_header('Git-commit', commit)
+          self.message.replace_header('Patch-mainline', patchops.get_tag(commit, self.repo))
+	  # Delete the first two lines
+          self.message.set_payload('\n'.join(map(str, text[2:])))
 
     def update_refs(self, refs):
         if not 'References' in self.message:
