@@ -23,7 +23,7 @@ DIR="."
 def export_patch(commit, options, prefix, suffix):
     """Export a single commit/patch. Return 0 for success, else 1."""
     try:
-        p = Patch(commit, debug=options.debug, force=options.force)
+        p = Patch(commit, debug=options.debug, force=options.force, stable=not options.skip_stable)
     except PatchException as e:
         print(e, file=sys.stderr)
         return 1
@@ -43,6 +43,7 @@ def export_patch(commit, options, prefix, suffix):
                 print("Commit %s is now empty. Skipping." % commit, file=sys.stderr)
                 return 0
         p.add_signature(options.signed_off_by)
+        p.stable_to_upstream()
         if options.write:
             fn = p.get_pathname(options.dir, prefix, suffix)
             if os.path.exists(fn) and not options.force:
@@ -101,6 +102,8 @@ def main():
     parser.add_option("-S", "--signed-off-by", action="store_true",
                       default=False,
                       help="Use Signed-off-by instead of Acked-by")
+    parser.add_option("-T", "--skip-stable", action="store_true",
+                     help="do not use heuristics to determine if the patch is from a stable branch", default=False)
 
     try:
         (options, args) = parser.parse_args()

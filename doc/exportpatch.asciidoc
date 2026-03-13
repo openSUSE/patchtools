@@ -17,7 +17,9 @@ the SUSE kernel-source repository.
 
 It is a requirement that each 'commit' is contained in the git remote repository
 as well as the local repository, though this can be overridden using the '-f'
-option.
+option. The 'commit' can be from a stable tree, in which case, *exportpatch*
+will attempt to transform the patch to mainline. This can be overridden by
+'-T' option.
 
 The behavior of *exportpatch* is controlled by the options below and the
 *patchtools.cfg(5)* configuration files. If no configuration files are
@@ -152,6 +154,13 @@ tags that contain the paths excluded.
 *-S*, *--signed-off-by*::
 By default, every patch exported has the user's 'Acked-by' tag added to it.
 This option uses the 'Signed-off-by' tag instead of 'Acked-by'.
+
+*-T*, *--skip-stable*::
+By default, if the commit is from the stable branch, it would replace
+'Patch-mainline' and 'Git-commit' tag from the commit's body. This option
+disables the check for stable tree and processes it as if it was a mainline
+patch.
+
 
 EXIT STATUS
 -----------
