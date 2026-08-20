@@ -46,8 +46,9 @@ def export_patch(commit, options, prefix, suffix):
         if options.write:
             fn = p.get_pathname(options.dir, prefix, suffix)
             if os.path.exists(fn) and not options.force:
+                suffix = "-%s%s" % (commit[0:8], suffix)
                 f = fn
-                fn += "-%s" % commit[0:8]
+                fn = p.get_pathname(options.dir, prefix, suffix)
                 print("%s already exists. Using %s" % (f, fn), file=sys.stderr)
             print(os.path.basename(fn))
             try:
