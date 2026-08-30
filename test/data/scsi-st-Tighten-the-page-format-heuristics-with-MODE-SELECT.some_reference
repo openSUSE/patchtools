@@ -1,4 +1,4 @@
-From: =?utf-8?q?Kai_M=C3=A4kisara_=3CKai=2EMakisara=40kolumbus=2Efi=3E?=
+From: Kai Mäkisara <Kai.Makisara@kolumbus.fi>
 Date: Tue, 11 Mar 2025 13:25:16 +0200
 Subject: scsi: st: Tighten the page format heuristics with MODE SELECT
 MIME-Version: 1.0
