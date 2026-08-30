@@ -475,6 +475,24 @@ class Patch:
         if is_empty:
             raise EmptyCommitException("commit is empty")
 
+    def stable_to_upstream(self):
+        text = self.message.get_payload().splitlines()
+        first_line = text[0]
+        if not "upstream" in first_line.casefold():
+          return
+        commit = ""
+        for word in first_line.split(' '):
+          if len(word) == 40 and all(c in string.hexdigits for c in word):
+              commit = word
+              break
+        if commit:
+          if self.debug:
+            print("Transforming stable commit to mainline ", word)
+          self.message.replace_header('Git-commit', commit)
+          self.message.replace_header('Patch-mainline', patchops.get_tag(commit, self.repo))
+	  # Delete the first two lines
+          self.message.set_payload('\n'.join(map(str, text[2:])))
+
     def update_refs(self, refs):
         if not 'References' in self.message:
             self.message.add_header('References', refs)
