@@ -238,7 +238,7 @@ class Patch:
             self.commit = args['h']
         del self.message['X-Git-Url']
 
-    def get_pathname(self, dirname=None, prefix="", suffix="", truncate=64):
+    def get_pathname(self, dirname=None, prefix="", suffix="", truncate=100):
         if self.message and self.message['Subject']:
             filename = patchops.safe_filename(self.message['Subject'])
             truncate_chars = truncate - len(filename) - len(prefix + suffix)

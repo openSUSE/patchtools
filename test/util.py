@@ -102,7 +102,7 @@ def find_data_dir_path():
 DATA_PATH = find_data_dir_path()
 
 
-def get_patch_path(fname, dirname=None, prefix='', suffix='', truncate=64):
+def get_patch_path(fname, dirname=None, prefix='', suffix='', infix='', truncate=100):
     """Return a patch filename, optionally truncated.
 
     The truncation code is copied in part from patch.py, so we match it.
@@ -110,10 +110,10 @@ def get_patch_path(fname, dirname=None, prefix='', suffix='', truncate=64):
     The truncation is used by exportpatch, but not fixpatch.
     """
     if truncate is not None:
-        truncate_chars = truncate - len(fname) - len(prefix + suffix)
+        truncate_chars = truncate - len(fname) - len(prefix + suffix) - (len(infix) + 1 if len(infix) else 0)
         if truncate_chars < 0:
             fname = fname[0:truncate_chars]
-    fpath = Path(prefix + fname + suffix)
+    fpath = Path(prefix + fname + ( '-' + infix if len(infix) else '') + suffix)
     if dirname:
         fpath = Path(dirname) / fpath
     return fpath

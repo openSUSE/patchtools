@@ -5,6 +5,7 @@ Support package for doing SUSE Patch operations
 
 from patchtools import PatchException
 from patchtools.command import run_command
+from patchtools.config import get_git_repo_url
 import re
 
 def key_version(tag):
@@ -73,16 +74,6 @@ def get_next_tag(repo):
 
 def get_diffstat(message):
     return run_command("diffstat -p1", input=message)
-
-def get_git_repo_url(dir):
-    command = f"(cd {dir}; git remote show origin -n)"
-    output = run_command(command)
-    for line in output.split('\n'):
-        m = re.search(r"URL:\s+(\S+)", line)
-        if m:
-            return m.group(1)
-
-    return None
 
 def confirm_commit(commit, repo):
     command = f"cd {repo} ; git rev-list HEAD --not --remotes $(git config --get branch.$(git symbolic-ref --short HEAD).remote)"

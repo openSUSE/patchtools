@@ -135,8 +135,7 @@ class TestExportpatchNormalFunctionality(unittest.TestCase):
             patch_name_orig = get_patch_path(PATCH_1F, dirname=tmpdir)
             patch_name_orig.touch()
             # now set up for actual path for patch name expected
-            patch_path_expected = \
-                    patch_name_orig.with_name(f'{patch_name_orig.name}-{COMMIT_1F[0:8]}')
+            patch_path_expected = get_patch_path(PATCH_1F, dirname=tmpdir, infix=COMMIT_1F[0:8])
             (res, pname, err_out) = call_mut(mut, MUT, ['-w', '-d', tmpdir, COMMIT_1F])
             self.assertEqual(res, 0, f'calling {MUT} returned faliure: {err_out}')
             self.assertEqual(pname.strip(), patch_path_expected.name, 'patch name wrong')

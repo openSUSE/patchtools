@@ -17,8 +17,8 @@ MAINLINE_URLS = [ """git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linu
                   """https://kernel.googlesource.com/pub/scm/linux/kernel/git/torvalds/linux.git"""
                 ]
 
-def get_git_repo_url(gitdir):
-    command = f"(cd {gitdir}; git remote show origin -n)"
+def get_git_repo_url(repo):
+    command = f"(cd {repo}; git remote show origin -n)"
     output = run_command(command)
     for line in output.split('\n'):
         m = re.search(r"URL:\s+(\S+)", line)
