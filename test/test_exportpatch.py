@@ -154,6 +154,14 @@ class TestExportpatchNormalFunctionality(unittest.TestCase):
             self.assertFalse(patch_path_expected.exists(),
                              'Patch file should not exist')
 
+    def test_exportpatch_no_mime_headers(self):
+        """Test exportpatch removes MIME-Version, Content-Type, and Content-Transfer-Encoding."""
+        (res, pbody, err_out) = call_mut(mut, MUT, [COMMIT_1F])
+        self.assertEqual(res, 0, f'calling {MUT} returned failure: {err_out}')
+        self.assertNotIn('MIME-Version:', pbody)
+        self.assertNotIn('Content-Type:', pbody)
+        self.assertNotIn('Content-Transfer-Encoding:', pbody)
+
     def test_to_file_in_cwd_defaults(self):
         """Test exportpatch to file/current-dir, using default arguments."""
         patch_path_expected = get_patch_path(PATCH_1F)

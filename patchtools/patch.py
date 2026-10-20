@@ -136,6 +136,13 @@ class Patch:
         else:
             self.message.add_header('Patch-mainline', ' '.join(tag))
 
+    def remove_mime_headers(self):
+        """Remove MIME-related headers from the patch message."""
+        if self.message:
+            del self.message['MIME-Version']
+            del self.message['Content-Type']
+            del self.message['Content-Transfer-Encoding']
+
     def from_email(self, msg):
         p = email.parser.Parser()
         self.message = p.parsestr(msg)

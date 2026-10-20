@@ -43,6 +43,7 @@ def export_patch(commit, options, prefix, suffix):
                 print("Commit %s is now empty. Skipping." % commit, file=sys.stderr)
                 return 0
         p.add_signature(options.signed_off_by)
+        p.remove_mime_headers()
         if options.write:
             fn = p.get_pathname(options.dir, prefix, suffix)
             if os.path.exists(fn) and not options.force:
